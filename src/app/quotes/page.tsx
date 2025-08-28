@@ -1,346 +1,297 @@
-"use client"
+// Enhanced quotes page with new pricing calculator integration
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Layout from '@/components/layout/Layout'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Clock, Package, Star, Shield, CheckCircle } from 'lucide-react'
-
-interface CityLocation {
-  city: string
-  state: string
-  fullName: string
-}
-
-interface PackageDetails {
-  weight: number
-  length: number
-  width: number
-  height: number
-  value: number
-}
-
-interface ShippingFormData {
-  fromLocation: CityLocation | null
-  toLocation: CityLocation | null
-  packageDetails: PackageDetails
-  deliveryType: string
-}
-
-interface CourierQuote {
-  id: string
-  courierName: string
-  logo: string
-  serviceType: string
-  deliveryTime: string
-  price: number
-  features: string[]
-  rating: number
-  reviews: number
-  isRecommended?: boolean
-  originalPrice?: number
-}
+import { pricingCalculator, type ShippingRequest } from '@/data/pricingCalculator'
+import type { CourierQuote } from '@/data/courierData'
+import { SAMPLE_SHIPPING_REQUESTS } from '@/data/mockData'
 
 export default function QuotesPage() {
-  const router = useRouter()
-  const [formData, setFormData] = useState<ShippingFormData | null>(null)
   const [quotes, setQuotes] = useState<CourierQuote[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [selectedQuote, setSelectedQuote] = useState<string | null>(null)
+  const [showBreakdown, setShowBreakdown] = useState<string | null>(null)
+  const [currentRequest, setCurrentRequest] = useState<ShippingRequest>(SAMPLE_SHIPPING_REQUESTS[0].request)
 
   useEffect(() => {
-    // Get form data from sessionStorage
-    const storedData = sessionStorage.getItem('shippingQuoteData')
-    if (!storedData) {
-      router.push('/')
-      return
-    }
+    generateQuotes()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentRequest])
 
-    const data = JSON.parse(storedData) as ShippingFormData
-    setFormData(data)
-
-    // Generate mock quotes based on the form data
-    const generateMockQuotes = async (formData: ShippingFormData) => {
-      setIsLoading(true)
-
+  const generateQuotes = async () => {
+    setLoading(true)
+    try {
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      // Calculate base price based on weight and distance
-      const basePrice = Math.max(formData.packageDetails.weight, getVolumetricWeight(formData.packageDetails)) * 15
-
-      // Mock courier quotes
-      const mockQuotes: CourierQuote[] = [
-        {
-          id: 'delhivery-1',
-          courierName: 'Delhivery',
-          logo: '🚚',
-          serviceType: formData.deliveryType === 'overnight' ? 'Next Day' : formData.deliveryType === 'express' ? 'Express' : 'Surface',
-          deliveryTime: formData.deliveryType === 'overnight' ? '1 day' : formData.deliveryType === 'express' ? '2-3 days' : '4-5 days',
-          price: Math.round(basePrice * (formData.deliveryType === 'overnight' ? 2.5 : formData.deliveryType === 'express' ? 1.8 : 1.2)),
-          features: ['Real-time tracking', 'Insurance included', 'Pickup & delivery', 'SMS notifications'],
-          rating: 4.3,
-          reviews: 12540,
-          isRecommended: formData.deliveryType === 'standard',
-          originalPrice: formData.deliveryType === 'standard' ? Math.round(basePrice * 1.4) : undefined
-        },
-        {
-          id: 'shadowfax-1',
-          courierName: 'Shadowfax',
-          logo: '⚡',
-          serviceType: formData.deliveryType === 'overnight' ? 'Same Day' : formData.deliveryType === 'express' ? 'Express' : 'Standard',
-          deliveryTime: formData.deliveryType === 'overnight' ? '6-8 hours' : formData.deliveryType === 'express' ? '1-2 days' : '3-4 days',
-          price: Math.round(basePrice * (formData.deliveryType === 'overnight' ? 3.0 : formData.deliveryType === 'express' ? 2.0 : 1.4)),
-          features: ['Fastest delivery', 'Live tracking', 'Fragile handling', 'Customer support'],
-          rating: 4.5,
-          reviews: 8900,
-          isRecommended: formData.deliveryType === 'overnight'
-        },
-        {
-          id: 'ekart-1',
-          courierName: 'Ekart (Flipkart)',
-          logo: '📦',
-          serviceType: formData.deliveryType === 'overnight' ? 'Priority' : formData.deliveryType === 'express' ? 'Express' : 'Regular',
-          deliveryTime: formData.deliveryType === 'overnight' ? '1 day' : formData.deliveryType === 'express' ? '2-3 days' : '4-6 days',
-          price: Math.round(basePrice * (formData.deliveryType === 'overnight' ? 2.2 : formData.deliveryType === 'express' ? 1.6 : 1.0)),
-          features: ['Reliable network', 'Easy returns', 'Secure packaging', 'COD available'],
-          rating: 4.1,
-          reviews: 15670,
-          isRecommended: formData.deliveryType === 'express',
-          originalPrice: formData.deliveryType === 'express' ? Math.round(basePrice * 1.8) : undefined
-        },
-        {
-          id: 'bluedart-1',
-          courierName: 'Blue Dart',
-          logo: '🌟',
-          serviceType: formData.deliveryType === 'overnight' ? 'Express' : formData.deliveryType === 'express' ? 'Speed' : 'Economy',
-          deliveryTime: formData.deliveryType === 'overnight' ? '1 day' : formData.deliveryType === 'express' ? '1-2 days' : '3-4 days',
-          price: Math.round(basePrice * (formData.deliveryType === 'overnight' ? 2.8 : formData.deliveryType === 'express' ? 2.2 : 1.6)),
-          features: ['Premium service', 'Insurance coverage', 'Priority handling', '24/7 support'],
-          rating: 4.6,
-          reviews: 7890
-        }
-      ]
-
-      // Sort quotes by price (lowest first)
-      const sortedQuotes = mockQuotes.sort((a, b) => a.price - b.price)
-      setQuotes(sortedQuotes)
-      setIsLoading(false)
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      const generatedQuotes = pricingCalculator.generateQuotes(currentRequest)
+      setQuotes(generatedQuotes)
+    } catch (error) {
+      console.error('Error generating quotes:', error)
+      setQuotes([])
+    } finally {
+      setLoading(false)
     }
+  }
 
-    generateMockQuotes(data)
-  }, [router])
+  const handleSelectQuote = (quoteId: string) => {
+    setSelectedQuote(quoteId)
+    // Here you would typically proceed to booking
+    alert(`Selected quote: ${quoteId}`)
+  }
 
-  const getVolumetricWeight = (packageDetails: PackageDetails) => {
-    const { length, width, height } = packageDetails
-    if (length > 0 && width > 0 && height > 0) {
-      return Math.round((length * width * height) / 5000 * 100) / 100
+  const toggleBreakdown = (quoteId: string) => {
+    setShowBreakdown(showBreakdown === quoteId ? null : quoteId)
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(amount)
+  }
+
+  const getDeliveryText = (quote: CourierQuote) => {
+    if (quote.delivery.minDays === quote.delivery.maxDays) {
+      return `${quote.delivery.minDays} ${quote.delivery.minDays === 1 ? 'day' : 'days'}`
     }
-    return 0
+    return `${quote.delivery.minDays}-${quote.delivery.maxDays} days`
   }
 
-  const handleBookNow = (quote: CourierQuote) => {
-    // Store selected quote for booking
-    sessionStorage.setItem('selectedQuote', JSON.stringify(quote))
-    router.push('/auth/login') // Redirect to login for booking
-  }
-
-  const handleBackToForm = () => {
-    router.push('/')
-  }
-
-  if (isLoading) {
+  const getRatingStars = (rating: number) => {
+    const fullStars = Math.floor(rating)
+    const hasHalfStar = rating % 1 !== 0
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
+    
     return (
-      <Layout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-lg text-gray-600">Getting best quotes for you...</p>
-            <p className="text-sm text-gray-500">Comparing prices from multiple couriers</p>
-          </div>
-        </div>
-      </Layout>
+      <div className="flex items-center">
+        {Array.from({ length: fullStars }, (_, i) => (
+          <span key={`full-${i}`} className="text-yellow-400">★</span>
+        ))}
+        {hasHalfStar && <span className="text-yellow-400">☆</span>}
+        {Array.from({ length: emptyStars }, (_, i) => (
+          <span key={`empty-${i}`} className="text-gray-300">☆</span>
+        ))}
+        <span className="ml-2 text-sm text-gray-600">({rating})</span>
+      </div>
     )
   }
 
-  if (!formData) {
+  if (loading) {
     return (
-      <Layout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
           <div className="text-center">
-            <p className="text-lg text-gray-600">No shipping data found</p>
-            <Button onClick={() => router.push('/')} className="mt-4">
-              Go Back to Home
-            </Button>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold text-gray-900">Generating quotes...</h2>
+            <p className="text-gray-600">Comparing rates from multiple courier partners</p>
           </div>
         </div>
-      </Layout>
+      </div>
     )
   }
-
-  const volumetricWeight = getVolumetricWeight(formData.packageDetails)
-  const chargeableWeight = Math.max(formData.packageDetails.weight, volumetricWeight)
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <Button
-              variant="outline"
-              onClick={handleBackToForm}
-              className="mb-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Quote Form
-            </Button>
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Shipping Quotes Comparison
-            </h1>
-            <p className="text-gray-600">
-              Compare prices and services from multiple courier partners
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Shipping Quotes</h1>
+          <p className="text-gray-600">
+            Compare rates from {quotes.length} courier partners for your shipment
+          </p>
+        </div>
 
-          {/* Shipment Summary */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="text-lg">Shipment Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Route</h4>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">{formData.fromLocation?.city}</span>
-                    <span className="mx-2">→</span>
-                    <span className="font-medium">{formData.toLocation?.city}</span>
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Package</h4>
-                  <p className="text-sm text-gray-600">
-                    {chargeableWeight} kg • {formData.packageDetails.length}×{formData.packageDetails.width}×{formData.packageDetails.height} cm
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Value</h4>
-                  <p className="text-sm text-gray-600">
-                    ₹{formData.packageDetails.value.toLocaleString()}
-                  </p>
-                </div>
+        {/* Shipment Summary */}
+        <div className="mb-6">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Shipment Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <p className="text-gray-600">From</p>
+                <p className="font-medium">{currentRequest.fromCity}, {currentRequest.fromState}</p>
               </div>
-            </CardContent>
+              <div>
+                <p className="text-gray-600">To</p>
+                <p className="font-medium">{currentRequest.toCity}, {currentRequest.toState}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">Package</p>
+                <p className="font-medium">{currentRequest.weight}kg • {currentRequest.deliveryType}</p>
+              </div>
+            </div>
           </Card>
+        </div>
 
-          {/* Quotes Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Sample Request Selector */}
+        <div className="mb-6">
+          <Card className="p-4">
+            <h3 className="font-medium mb-3">Try Different Scenarios</h3>
+            <div className="flex flex-wrap gap-2">
+              {SAMPLE_SHIPPING_REQUESTS.map((sample) => (
+                <Button
+                  key={sample.id}
+                  variant={currentRequest === sample.request ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCurrentRequest(sample.request)}
+                >
+                  {sample.name}
+                </Button>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* Quotes */}
+        {quotes.length === 0 ? (
+          <Card className="p-8 text-center">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No quotes available</h3>
+            <p className="text-gray-600">Unable to generate quotes for this route. Please try a different destination.</p>
+          </Card>
+        ) : (
+          <div className="space-y-4">
             {quotes.map((quote) => (
-              <Card key={quote.id} className={`relative ${quote.isRecommended ? 'ring-2 ring-blue-500' : ''}`}>
-                {quote.isRecommended && (
-                  <div className="absolute -top-3 left-4">
-                    <Badge className="bg-blue-600 text-white">
-                      <Star className="h-3 w-3 mr-1" />
-                      Recommended
-                    </Badge>
-                  </div>
-                )}
-                
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{quote.logo}</span>
+              <Card key={quote.id} className={`p-6 transition-all duration-200 ${
+                quote.isRecommended ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+              } ${selectedQuote === quote.id ? 'ring-2 ring-green-500' : ''}`}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    {/* Courier Header */}
+                    <div className="flex items-center mb-4">
+                      <span className="text-2xl mr-3">{quote.courierService.logo}</span>
                       <div>
-                        <h3 className="font-semibold text-lg">{quote.courierName}</h3>
-                        <p className="text-sm text-gray-600">{quote.serviceType}</p>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {quote.courierService.displayName}
+                          {quote.isRecommended && (
+                            <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                              Recommended
+                            </span>
+                          )}
+                        </h3>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          {getRatingStars(quote.courierService.rating)}
+                          <span>• {quote.serviceType.displayName}</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      {quote.originalPrice && (
-                        <p className="text-sm text-gray-500 line-through">
-                          ₹{quote.originalPrice}
+
+                    {/* Delivery Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-600">Delivery Time</p>
+                        <p className="font-medium">{getDeliveryText(quote)}</p>
+                        <p className="text-xs text-gray-500">
+                          {quote.delivery.workingDaysOnly ? 'Working days only' : 'Calendar days'}
                         </p>
-                      )}
-                      <p className="text-2xl font-bold text-green-600">
-                        ₹{quote.price}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Delivery Time */}
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-400" />
-                      <span className="font-medium">Delivery: {quote.deliveryTime}</span>
-                    </div>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="ml-1 font-medium">{quote.rating}</span>
-                        <span className="ml-1 text-sm text-gray-500">
-                          ({quote.reviews.toLocaleString()} reviews)
-                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Cutoff Time</p>
+                        <p className="font-medium">{quote.delivery.cutoffTime}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Confidence</p>
+                        <p className="font-medium">{quote.confidence}%</p>
                       </div>
                     </div>
 
                     {/* Features */}
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Features</h4>
-                      <div className="grid grid-cols-2 gap-1">
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-600 mb-2">Features</p>
+                      <div className="flex flex-wrap gap-2">
                         {quote.features.map((feature, index) => (
-                          <div key={index} className="flex items-center gap-1 text-sm text-gray-600">
-                            <CheckCircle className="h-3 w-3 text-green-500" />
+                          <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
                             {feature}
-                          </div>
+                          </span>
                         ))}
                       </div>
                     </div>
-
-                    {/* Book Now Button */}
-                    <Button
-                      onClick={() => handleBookNow(quote)}
-                      className={`w-full ${
-                        quote.isRecommended 
-                          ? 'bg-blue-600 hover:bg-blue-700' 
-                          : 'bg-gray-900 hover:bg-gray-800'
-                      }`}
-                    >
-                      <Package className="h-4 w-4 mr-2" />
-                      Book Now
-                    </Button>
                   </div>
-                </CardContent>
+
+                  {/* Price Section */}
+                  <div className="text-right ml-6">
+                    <div className="text-2xl font-bold text-gray-900 mb-2">
+                      {formatCurrency(quote.pricing.totalPrice)}
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">
+                      All inclusive
+                    </p>
+                    
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toggleBreakdown(quote.id)}
+                        className="w-full"
+                      >
+                        {showBreakdown === quote.id ? 'Hide' : 'Show'} Breakdown
+                      </Button>
+                      
+                      <Button
+                        onClick={() => handleSelectQuote(quote.id)}
+                        className="w-full"
+                        variant={quote.isRecommended ? 'default' : 'outline'}
+                      >
+                        Select This Quote
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price Breakdown */}
+                {showBreakdown === quote.id && (
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <h4 className="font-medium mb-3">Price Breakdown</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Base Price</span>
+                        <span>{formatCurrency(quote.pricing.basePrice)}</span>
+                      </div>
+                      
+                      {quote.pricing.additionalCharges.map((charge, index) => (
+                        <div key={index} className="flex justify-between text-gray-600">
+                          <span>{charge.name}</span>
+                          <span>+{formatCurrency(charge.amount)}</span>
+                        </div>
+                      ))}
+                      
+                      {quote.pricing.discounts.map((discount, index) => (
+                        <div key={index} className="flex justify-between text-green-600">
+                          <span>{discount.name}</span>
+                          <span>-{formatCurrency(discount.amount)}</span>
+                        </div>
+                      ))}
+                      
+                      {quote.pricing.taxes.map((tax, index) => (
+                        <div key={index} className="flex justify-between text-gray-600">
+                          <span>{tax.name}</span>
+                          <span>+{formatCurrency(tax.amount)}</span>
+                        </div>
+                      ))}
+                      
+                      <div className="flex justify-between font-semibold pt-2 border-t border-gray-200">
+                        <span>Total Amount</span>
+                        <span>{formatCurrency(quote.pricing.totalPrice)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </Card>
             ))}
           </div>
+        )}
 
-          {/* Additional Info */}
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Why Ship Smart?
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-800">
-              <div>
-                <strong>Best Prices:</strong> Compare rates from multiple couriers and save up to 40%
-              </div>
-              <div>
-                <strong>Reliable Service:</strong> Partner with India&apos;s top courier companies
-              </div>
-              <div>
-                <strong>Full Support:</strong> End-to-end tracking and customer support
-              </div>
-            </div>
-          </div>
+        {/* Bottom Actions */}
+        <div className="mt-8 text-center">
+          <Button variant="outline" onClick={generateQuotes}>
+            Refresh Quotes
+          </Button>
         </div>
       </div>
-    </Layout>
+    </div>
   )
 }
