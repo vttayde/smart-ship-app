@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Production builds
+.next/
+out/
+dist/
+build/
+
+# Environment files
+.env*
+
+# Generated files
+next-env.d.ts
+
+# Database
+*.db
+*.sqlite
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,4 +1,4 @@
-import { withAuth } from 'next-auth/middleware'
+import { withAuth } from 'next-auth/middleware';
 
 export default withAuth(
   function middleware() {
@@ -8,11 +8,11 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         // Check if user is authenticated
-        if (!token) return false
+        if (!token) return false;
 
         // Protect admin routes
         if (req.nextUrl.pathname.startsWith('/admin')) {
-          return token.role === 'ADMIN' || token.role === 'SUPER_ADMIN'
+          return token.role === 'ADMIN' || token.role === 'SUPER_ADMIN';
         }
 
         // Protect dashboard and user routes
@@ -22,14 +22,14 @@ export default withAuth(
           req.nextUrl.pathname.startsWith('/orders') ||
           req.nextUrl.pathname.startsWith('/bookings')
         ) {
-          return !!token
+          return !!token;
         }
 
-        return true
+        return true;
       },
     },
   }
-)
+);
 
 export const config = {
   matcher: [
@@ -38,5 +38,5 @@ export const config = {
     '/orders/:path*',
     '/bookings/:path*',
     '/admin/:path*',
-  ]
-}
+  ],
+};

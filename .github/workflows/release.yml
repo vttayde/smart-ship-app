@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run quality checks
+        run: |
+          npm run lint
+          npm run type-check
+          npm run format:check
+
+      - name: Build application
+        run: npm run build
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            echo "CHANGELOG_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGELOG_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## Smart Ship Application Release ${{ github.ref }}
+
+            ### What's Changed
+            This release includes the latest features and improvements to the Smart Ship shipping comparison platform.
+
+            ### Features
+            - Professional authentication system with NextAuth.js
+            - Comprehensive shipping quote comparison
+            - Real-time location services
+            - Responsive UI with Tailwind CSS
+            - Enhanced code quality with ESLint and Prettier
+
+            ### Technical Improvements
+            - TypeScript for type safety
+            - Modern React patterns and hooks
+            - Optimized build process
+            - Comprehensive CI/CD pipeline
+
+            For detailed changes, see the commit history.
+
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v0.1.0...${{ github.ref }}
+          draft: false
+          prerelease: false

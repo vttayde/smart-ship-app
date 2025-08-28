@@ -1,17 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    
+    const session = await getServerSession(authOptions);
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -36,21 +33,18 @@ export async function GET() {
             state: true,
             pincode: true,
             isDefault: true,
-          }
+          },
         },
         _count: {
           select: {
-            orders: true
-          }
-        }
-      }
-    })
+            orders: true,
+          },
+        },
+      },
+    });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -59,52 +53,42 @@ export async function GET() {
         ...user,
         name: `${user.firstName} ${user.lastName}`.trim(),
         orderCount: user._count.orders,
-      }
-    })
-
+      },
+    });
   } catch (error) {
-    console.error('Profile fetch error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('Profile fetch error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    
+    const session = await getServerSession(authOptions);
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json()
-    const { firstName, lastName, phone } = body
+    const body = await request.json();
+    const { firstName, lastName, phone } = body;
 
     // Validation
-    const errors: { [key: string]: string } = {}
+    const errors: { [key: string]: string } = {};
 
     if (firstName && firstName.trim().length < 1) {
-      errors.firstName = 'First name cannot be empty'
+      errors.firstName = 'First name cannot be empty';
     }
 
     if (lastName && lastName.trim().length < 1) {
-      errors.lastName = 'Last name cannot be empty'
+      errors.lastName = 'Last name cannot be empty';
     }
 
     if (phone && !/^[6-9]\d{9}$/.test(phone.replace(/\s+/g, ''))) {
-      errors.phone = 'Please enter a valid phone number'
+      errors.phone = 'Please enter a valid phone number';
     }
 
     if (Object.keys(errors).length > 0) {
-      return NextResponse.json(
-        { success: false, errors },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
     // Check if phone is already taken by another user
@@ -112,15 +96,15 @@ export async function PUT(request: NextRequest) {
       const phoneExists = await prisma.user.findFirst({
         where: {
           phone: phone.trim(),
-          NOT: { id: session.user.id }
-        }
-      })
+          NOT: { id: session.user.id },
+        },
+      });
 
       if (phoneExists) {
         return NextResponse.json(
           { success: false, errors: { phone: 'Phone number is already in use' } },
           { status: 409 }
-        )
+        );
       }
     }
 
@@ -141,8 +125,8 @@ export async function PUT(request: NextRequest) {
         emailVerified: true,
         phoneVerified: true,
         updatedAt: true,
-      }
-    })
+      },
+    });
 
     return NextResponse.json({
       success: true,
@@ -150,14 +134,10 @@ export async function PUT(request: NextRequest) {
       user: {
         ...updatedUser,
         name: `${updatedUser.firstName} ${updatedUser.lastName}`.trim(),
-      }
-    })
-
+      },
+    });
   } catch (error) {
-    console.error('Profile update error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('Profile update error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

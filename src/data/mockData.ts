@@ -1,6 +1,6 @@
 // Enhanced mock data with more realistic pricing and comprehensive courier information
 
-import type { PricingRule, DeliveryTimeframe } from './courierData'
+import type { PricingRule, DeliveryTimeframe } from './courierData';
 
 // Additional comprehensive pricing rules for all courier-service combinations
 export const ADDITIONAL_PRICING_RULES: PricingRule[] = [
@@ -15,23 +15,41 @@ export const ADDITIONAL_PRICING_RULES: PricingRule[] = [
       { minWeight: 0.5, maxWeight: 1, basePrice: 42, additionalWeightPrice: 14, fuelSurcharge: 12 },
       { minWeight: 1, maxWeight: 5, basePrice: 58, additionalWeightPrice: 16, fuelSurcharge: 12 },
       { minWeight: 5, maxWeight: 10, basePrice: 85, additionalWeightPrice: 20, fuelSurcharge: 12 },
-      { minWeight: 10, maxWeight: 50, basePrice: 125, additionalWeightPrice: 23, fuelSurcharge: 12 }
+      {
+        minWeight: 10,
+        maxWeight: 50,
+        basePrice: 125,
+        additionalWeightPrice: 23,
+        fuelSurcharge: 12,
+      },
     ],
     additionalCharges: [
-      { id: 'cod', name: 'COD Charges', type: 'percentage', value: 1.5, description: 'Cash on Delivery charges' },
-      { id: 'fuel', name: 'Fuel Surcharge', type: 'percentage', value: 12, description: 'Fuel price fluctuation adjustment' }
+      {
+        id: 'cod',
+        name: 'COD Charges',
+        type: 'percentage',
+        value: 1.5,
+        description: 'Cash on Delivery charges',
+      },
+      {
+        id: 'fuel',
+        name: 'Fuel Surcharge',
+        type: 'percentage',
+        value: 12,
+        description: 'Fuel price fluctuation adjustment',
+      },
     ],
     discounts: [
-      { 
-        id: 'same_day', 
-        name: 'Same Day Discount', 
-        type: 'percentage', 
-        value: 5, 
+      {
+        id: 'same_day',
+        name: 'Same Day Discount',
+        type: 'percentage',
+        value: 5,
         description: 'Discount for same-day delivery bookings',
-        conditions: { }
-      }
+        conditions: {},
+      },
     ],
-    isActive: true
+    isActive: true,
   },
   {
     id: 'shadowfax_express_metro',
@@ -43,14 +61,32 @@ export const ADDITIONAL_PRICING_RULES: PricingRule[] = [
       { minWeight: 0.5, maxWeight: 1, basePrice: 58, additionalWeightPrice: 18, fuelSurcharge: 12 },
       { minWeight: 1, maxWeight: 5, basePrice: 78, additionalWeightPrice: 22, fuelSurcharge: 12 },
       { minWeight: 5, maxWeight: 10, basePrice: 115, additionalWeightPrice: 28, fuelSurcharge: 12 },
-      { minWeight: 10, maxWeight: 30, basePrice: 165, additionalWeightPrice: 32, fuelSurcharge: 12 }
+      {
+        minWeight: 10,
+        maxWeight: 30,
+        basePrice: 165,
+        additionalWeightPrice: 32,
+        fuelSurcharge: 12,
+      },
     ],
     additionalCharges: [
-      { id: 'cod', name: 'COD Charges', type: 'percentage', value: 1.5, description: 'Cash on Delivery charges' },
-      { id: 'fuel', name: 'Fuel Surcharge', type: 'percentage', value: 12, description: 'Fuel price fluctuation adjustment' }
+      {
+        id: 'cod',
+        name: 'COD Charges',
+        type: 'percentage',
+        value: 1.5,
+        description: 'Cash on Delivery charges',
+      },
+      {
+        id: 'fuel',
+        name: 'Fuel Surcharge',
+        type: 'percentage',
+        value: 12,
+        description: 'Fuel price fluctuation adjustment',
+      },
     ],
     discounts: [],
-    isActive: true
+    isActive: true,
   },
   {
     id: 'shadowfax_overnight_metro',
@@ -62,15 +98,39 @@ export const ADDITIONAL_PRICING_RULES: PricingRule[] = [
       { minWeight: 0.5, maxWeight: 1, basePrice: 95, additionalWeightPrice: 30, fuelSurcharge: 12 },
       { minWeight: 1, maxWeight: 5, basePrice: 135, additionalWeightPrice: 35, fuelSurcharge: 12 },
       { minWeight: 5, maxWeight: 10, basePrice: 195, additionalWeightPrice: 45, fuelSurcharge: 12 },
-      { minWeight: 10, maxWeight: 20, basePrice: 275, additionalWeightPrice: 55, fuelSurcharge: 12 }
+      {
+        minWeight: 10,
+        maxWeight: 20,
+        basePrice: 275,
+        additionalWeightPrice: 55,
+        fuelSurcharge: 12,
+      },
     ],
     additionalCharges: [
-      { id: 'cod', name: 'COD Charges', type: 'percentage', value: 1.5, description: 'Cash on Delivery charges' },
-      { id: 'fuel', name: 'Fuel Surcharge', type: 'percentage', value: 12, description: 'Fuel price fluctuation adjustment' },
-      { id: 'priority', name: 'Priority Handling', type: 'fixed', value: 25, description: 'Priority processing fee' }
+      {
+        id: 'cod',
+        name: 'COD Charges',
+        type: 'percentage',
+        value: 1.5,
+        description: 'Cash on Delivery charges',
+      },
+      {
+        id: 'fuel',
+        name: 'Fuel Surcharge',
+        type: 'percentage',
+        value: 12,
+        description: 'Fuel price fluctuation adjustment',
+      },
+      {
+        id: 'priority',
+        name: 'Priority Handling',
+        type: 'fixed',
+        value: 25,
+        description: 'Priority processing fee',
+      },
     ],
     discounts: [],
-    isActive: true
+    isActive: true,
   },
 
   // Ekart pricing rules
@@ -84,23 +144,41 @@ export const ADDITIONAL_PRICING_RULES: PricingRule[] = [
       { minWeight: 0.5, maxWeight: 1, basePrice: 48, additionalWeightPrice: 16, fuelSurcharge: 18 },
       { minWeight: 1, maxWeight: 5, basePrice: 68, additionalWeightPrice: 19, fuelSurcharge: 18 },
       { minWeight: 5, maxWeight: 10, basePrice: 98, additionalWeightPrice: 24, fuelSurcharge: 18 },
-      { minWeight: 10, maxWeight: 50, basePrice: 148, additionalWeightPrice: 27, fuelSurcharge: 18 }
+      {
+        minWeight: 10,
+        maxWeight: 50,
+        basePrice: 148,
+        additionalWeightPrice: 27,
+        fuelSurcharge: 18,
+      },
     ],
     additionalCharges: [
-      { id: 'cod', name: 'COD Charges', type: 'percentage', value: 2.5, description: 'Cash on Delivery charges' },
-      { id: 'fuel', name: 'Fuel Surcharge', type: 'percentage', value: 18, description: 'Fuel price fluctuation adjustment' }
+      {
+        id: 'cod',
+        name: 'COD Charges',
+        type: 'percentage',
+        value: 2.5,
+        description: 'Cash on Delivery charges',
+      },
+      {
+        id: 'fuel',
+        name: 'Fuel Surcharge',
+        type: 'percentage',
+        value: 18,
+        description: 'Fuel price fluctuation adjustment',
+      },
     ],
     discounts: [
-      { 
-        id: 'flipkart_seller', 
-        name: 'Flipkart Seller Discount', 
-        type: 'percentage', 
-        value: 15, 
+      {
+        id: 'flipkart_seller',
+        name: 'Flipkart Seller Discount',
+        type: 'percentage',
+        value: 15,
         description: 'Special discount for Flipkart sellers',
-        conditions: { minWeight: 5 }
-      }
+        conditions: { minWeight: 5 },
+      },
     ],
-    isActive: true
+    isActive: true,
   },
 
   // Blue Dart pricing rules
@@ -114,24 +192,48 @@ export const ADDITIONAL_PRICING_RULES: PricingRule[] = [
       { minWeight: 0.5, maxWeight: 1, basePrice: 62, additionalWeightPrice: 22, fuelSurcharge: 20 },
       { minWeight: 1, maxWeight: 5, basePrice: 95, additionalWeightPrice: 28, fuelSurcharge: 20 },
       { minWeight: 5, maxWeight: 10, basePrice: 145, additionalWeightPrice: 35, fuelSurcharge: 20 },
-      { minWeight: 10, maxWeight: 50, basePrice: 225, additionalWeightPrice: 42, fuelSurcharge: 20 }
+      {
+        minWeight: 10,
+        maxWeight: 50,
+        basePrice: 225,
+        additionalWeightPrice: 42,
+        fuelSurcharge: 20,
+      },
     ],
     additionalCharges: [
-      { id: 'cod', name: 'COD Charges', type: 'percentage', value: 2, description: 'Cash on Delivery charges' },
-      { id: 'fuel', name: 'Fuel Surcharge', type: 'percentage', value: 20, description: 'Fuel price fluctuation adjustment' },
-      { id: 'premium', name: 'Premium Service', type: 'fixed', value: 15, description: 'Premium handling and tracking' }
+      {
+        id: 'cod',
+        name: 'COD Charges',
+        type: 'percentage',
+        value: 2,
+        description: 'Cash on Delivery charges',
+      },
+      {
+        id: 'fuel',
+        name: 'Fuel Surcharge',
+        type: 'percentage',
+        value: 20,
+        description: 'Fuel price fluctuation adjustment',
+      },
+      {
+        id: 'premium',
+        name: 'Premium Service',
+        type: 'fixed',
+        value: 15,
+        description: 'Premium handling and tracking',
+      },
     ],
     discounts: [
-      { 
-        id: 'corporate', 
-        name: 'Corporate Account Discount', 
-        type: 'percentage', 
-        value: 12, 
+      {
+        id: 'corporate',
+        name: 'Corporate Account Discount',
+        type: 'percentage',
+        value: 12,
         description: 'Discount for corporate customers',
-        conditions: { minValue: 1000 }
-      }
+        conditions: { minValue: 1000 },
+      },
     ],
-    isActive: true
+    isActive: true,
   },
   {
     id: 'bluedart_express_metro',
@@ -143,15 +245,39 @@ export const ADDITIONAL_PRICING_RULES: PricingRule[] = [
       { minWeight: 0.5, maxWeight: 1, basePrice: 85, additionalWeightPrice: 32, fuelSurcharge: 20 },
       { minWeight: 1, maxWeight: 5, basePrice: 125, additionalWeightPrice: 38, fuelSurcharge: 20 },
       { minWeight: 5, maxWeight: 10, basePrice: 195, additionalWeightPrice: 48, fuelSurcharge: 20 },
-      { minWeight: 10, maxWeight: 30, basePrice: 295, additionalWeightPrice: 58, fuelSurcharge: 20 }
+      {
+        minWeight: 10,
+        maxWeight: 30,
+        basePrice: 295,
+        additionalWeightPrice: 58,
+        fuelSurcharge: 20,
+      },
     ],
     additionalCharges: [
-      { id: 'cod', name: 'COD Charges', type: 'percentage', value: 2, description: 'Cash on Delivery charges' },
-      { id: 'fuel', name: 'Fuel Surcharge', type: 'percentage', value: 20, description: 'Fuel price fluctuation adjustment' },
-      { id: 'premium', name: 'Premium Service', type: 'fixed', value: 25, description: 'Premium handling and tracking' }
+      {
+        id: 'cod',
+        name: 'COD Charges',
+        type: 'percentage',
+        value: 2,
+        description: 'Cash on Delivery charges',
+      },
+      {
+        id: 'fuel',
+        name: 'Fuel Surcharge',
+        type: 'percentage',
+        value: 20,
+        description: 'Fuel price fluctuation adjustment',
+      },
+      {
+        id: 'premium',
+        name: 'Premium Service',
+        type: 'fixed',
+        value: 25,
+        description: 'Premium handling and tracking',
+      },
     ],
     discounts: [],
-    isActive: true
+    isActive: true,
   },
 
   // DTDC pricing rules
@@ -165,58 +291,238 @@ export const ADDITIONAL_PRICING_RULES: PricingRule[] = [
       { minWeight: 0.5, maxWeight: 1, basePrice: 40, additionalWeightPrice: 13, fuelSurcharge: 14 },
       { minWeight: 1, maxWeight: 5, basePrice: 55, additionalWeightPrice: 15, fuelSurcharge: 14 },
       { minWeight: 5, maxWeight: 10, basePrice: 80, additionalWeightPrice: 18, fuelSurcharge: 14 },
-      { minWeight: 10, maxWeight: 50, basePrice: 120, additionalWeightPrice: 21, fuelSurcharge: 14 }
+      {
+        minWeight: 10,
+        maxWeight: 50,
+        basePrice: 120,
+        additionalWeightPrice: 21,
+        fuelSurcharge: 14,
+      },
     ],
     additionalCharges: [
-      { id: 'cod', name: 'COD Charges', type: 'percentage', value: 2, description: 'Cash on Delivery charges' },
-      { id: 'fuel', name: 'Fuel Surcharge', type: 'percentage', value: 14, description: 'Fuel price fluctuation adjustment' }
+      {
+        id: 'cod',
+        name: 'COD Charges',
+        type: 'percentage',
+        value: 2,
+        description: 'Cash on Delivery charges',
+      },
+      {
+        id: 'fuel',
+        name: 'Fuel Surcharge',
+        type: 'percentage',
+        value: 14,
+        description: 'Fuel price fluctuation adjustment',
+      },
     ],
     discounts: [
-      { 
-        id: 'franchise_discount', 
-        name: 'Franchise Partner Discount', 
-        type: 'percentage', 
-        value: 8, 
+      {
+        id: 'franchise_discount',
+        name: 'Franchise Partner Discount',
+        type: 'percentage',
+        value: 8,
         description: 'Discount through franchise network',
-        conditions: { minWeight: 2 }
-      }
+        conditions: { minWeight: 2 },
+      },
     ],
-    isActive: true
-  }
-]
+    isActive: true,
+  },
+];
 
 // Additional delivery timeframes for comprehensive coverage
 export const ADDITIONAL_DELIVERY_TIMEFRAMES: DeliveryTimeframe[] = [
   // Shadowfax timeframes
-  { courierId: 'shadowfax', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 1, maxDays: 3, workingDaysOnly: true, cutoffTime: '18:00' },
-  { courierId: 'shadowfax', serviceTypeId: 'express', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 0, maxDays: 1, workingDaysOnly: false, cutoffTime: '16:00' },
-  { courierId: 'shadowfax', serviceTypeId: 'overnight', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 0, maxDays: 0, workingDaysOnly: false, cutoffTime: '14:00' },
-  
+  {
+    courierId: 'shadowfax',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 1,
+    maxDays: 3,
+    workingDaysOnly: true,
+    cutoffTime: '18:00',
+  },
+  {
+    courierId: 'shadowfax',
+    serviceTypeId: 'express',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 0,
+    maxDays: 1,
+    workingDaysOnly: false,
+    cutoffTime: '16:00',
+  },
+  {
+    courierId: 'shadowfax',
+    serviceTypeId: 'overnight',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 0,
+    maxDays: 0,
+    workingDaysOnly: false,
+    cutoffTime: '14:00',
+  },
+
   // Ekart timeframes
-  { courierId: 'ekart', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 2, maxDays: 4, workingDaysOnly: true, cutoffTime: '17:30' },
-  { courierId: 'ekart', serviceTypeId: 'express', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 1, maxDays: 2, workingDaysOnly: true, cutoffTime: '15:30' },
-  
+  {
+    courierId: 'ekart',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 2,
+    maxDays: 4,
+    workingDaysOnly: true,
+    cutoffTime: '17:30',
+  },
+  {
+    courierId: 'ekart',
+    serviceTypeId: 'express',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 1,
+    maxDays: 2,
+    workingDaysOnly: true,
+    cutoffTime: '15:30',
+  },
+
   // Blue Dart timeframes
-  { courierId: 'bluedart', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 1, maxDays: 3, workingDaysOnly: true, cutoffTime: '16:30' },
-  { courierId: 'bluedart', serviceTypeId: 'express', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 0, maxDays: 1, workingDaysOnly: true, cutoffTime: '14:30' },
-  { courierId: 'bluedart', serviceTypeId: 'overnight', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 0, maxDays: 1, workingDaysOnly: false, cutoffTime: '13:00' },
-  
+  {
+    courierId: 'bluedart',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 1,
+    maxDays: 3,
+    workingDaysOnly: true,
+    cutoffTime: '16:30',
+  },
+  {
+    courierId: 'bluedart',
+    serviceTypeId: 'express',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 0,
+    maxDays: 1,
+    workingDaysOnly: true,
+    cutoffTime: '14:30',
+  },
+  {
+    courierId: 'bluedart',
+    serviceTypeId: 'overnight',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 0,
+    maxDays: 1,
+    workingDaysOnly: false,
+    cutoffTime: '13:00',
+  },
+
   // DTDC timeframes
-  { courierId: 'dtdc', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 2, maxDays: 5, workingDaysOnly: true, cutoffTime: '17:00' },
-  { courierId: 'dtdc', serviceTypeId: 'express', fromZone: 'metro_tier1', toZone: 'metro_tier1', minDays: 1, maxDays: 3, workingDaysOnly: true, cutoffTime: '15:00' },
+  {
+    courierId: 'dtdc',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 2,
+    maxDays: 5,
+    workingDaysOnly: true,
+    cutoffTime: '17:00',
+  },
+  {
+    courierId: 'dtdc',
+    serviceTypeId: 'express',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier1',
+    minDays: 1,
+    maxDays: 3,
+    workingDaysOnly: true,
+    cutoffTime: '15:00',
+  },
 
   // Inter-zone timeframes for metro to non-metro
-  { courierId: 'delhivery', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier2', minDays: 3, maxDays: 5, workingDaysOnly: true, cutoffTime: '17:00' },
-  { courierId: 'shadowfax', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier2', minDays: 2, maxDays: 4, workingDaysOnly: true, cutoffTime: '18:00' },
-  { courierId: 'ekart', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier2', minDays: 3, maxDays: 6, workingDaysOnly: true, cutoffTime: '17:30' },
-  { courierId: 'bluedart', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier2', minDays: 2, maxDays: 4, workingDaysOnly: true, cutoffTime: '16:30' },
-  { courierId: 'dtdc', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'metro_tier2', minDays: 3, maxDays: 6, workingDaysOnly: true, cutoffTime: '17:00' },
+  {
+    courierId: 'delhivery',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier2',
+    minDays: 3,
+    maxDays: 5,
+    workingDaysOnly: true,
+    cutoffTime: '17:00',
+  },
+  {
+    courierId: 'shadowfax',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier2',
+    minDays: 2,
+    maxDays: 4,
+    workingDaysOnly: true,
+    cutoffTime: '18:00',
+  },
+  {
+    courierId: 'ekart',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier2',
+    minDays: 3,
+    maxDays: 6,
+    workingDaysOnly: true,
+    cutoffTime: '17:30',
+  },
+  {
+    courierId: 'bluedart',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier2',
+    minDays: 2,
+    maxDays: 4,
+    workingDaysOnly: true,
+    cutoffTime: '16:30',
+  },
+  {
+    courierId: 'dtdc',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'metro_tier2',
+    minDays: 3,
+    maxDays: 6,
+    workingDaysOnly: true,
+    cutoffTime: '17:00',
+  },
 
   // Remote area deliveries
-  { courierId: 'delhivery', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'remote_areas', minDays: 5, maxDays: 8, workingDaysOnly: true, cutoffTime: '17:00' },
-  { courierId: 'bluedart', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'remote_areas', minDays: 4, maxDays: 7, workingDaysOnly: true, cutoffTime: '16:30' },
-  { courierId: 'dtdc', serviceTypeId: 'surface', fromZone: 'metro_tier1', toZone: 'remote_areas', minDays: 4, maxDays: 8, workingDaysOnly: true, cutoffTime: '17:00' }
-]
+  {
+    courierId: 'delhivery',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'remote_areas',
+    minDays: 5,
+    maxDays: 8,
+    workingDaysOnly: true,
+    cutoffTime: '17:00',
+  },
+  {
+    courierId: 'bluedart',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'remote_areas',
+    minDays: 4,
+    maxDays: 7,
+    workingDaysOnly: true,
+    cutoffTime: '16:30',
+  },
+  {
+    courierId: 'dtdc',
+    serviceTypeId: 'surface',
+    fromZone: 'metro_tier1',
+    toZone: 'remote_areas',
+    minDays: 4,
+    maxDays: 8,
+    workingDaysOnly: true,
+    cutoffTime: '17:00',
+  },
+];
 
 // Sample shipping scenarios for testing
 export const SAMPLE_SHIPPING_REQUESTS = [
@@ -236,8 +542,8 @@ export const SAMPLE_SHIPPING_REQUESTS = [
       isFragile: false,
       requiresCOD: false,
       deliveryType: 'standard' as const,
-      packageType: 'parcel' as const
-    }
+      packageType: 'parcel' as const,
+    },
   },
   {
     id: 'sample_2',
@@ -255,8 +561,8 @@ export const SAMPLE_SHIPPING_REQUESTS = [
       isFragile: false,
       requiresCOD: false,
       deliveryType: 'express' as const,
-      packageType: 'documents' as const
-    }
+      packageType: 'documents' as const,
+    },
   },
   {
     id: 'sample_3',
@@ -274,8 +580,8 @@ export const SAMPLE_SHIPPING_REQUESTS = [
       isFragile: true,
       requiresCOD: true,
       deliveryType: 'standard' as const,
-      packageType: 'fragile' as const
-    }
+      packageType: 'fragile' as const,
+    },
   },
   {
     id: 'sample_4',
@@ -293,15 +599,15 @@ export const SAMPLE_SHIPPING_REQUESTS = [
       isFragile: false,
       requiresCOD: false,
       deliveryType: 'overnight' as const,
-      packageType: 'parcel' as const
-    }
-  }
-]
+      packageType: 'parcel' as const,
+    },
+  },
+];
 
 const mockData = {
   ADDITIONAL_PRICING_RULES,
   ADDITIONAL_DELIVERY_TIMEFRAMES,
-  SAMPLE_SHIPPING_REQUESTS
-}
+  SAMPLE_SHIPPING_REQUESTS,
+};
 
-export default mockData
+export default mockData;
