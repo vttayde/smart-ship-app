@@ -14,8 +14,8 @@ export default function Home() {
   const router = useRouter()
 
   const handleSearch = () => {
-    // For now, redirect to login since we need auth for booking
-    router.push('/auth/login')
+    // Redirect to detailed shipping form
+    router.push('/ship')
   }
 
   return (
