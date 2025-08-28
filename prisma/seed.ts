@@ -3,7 +3,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  /* eslint-disable */
+    console.log('🌱 Seeding database...');
 
   // Create courier partners
   const delhivery = await prisma.courierPartner.upsert({

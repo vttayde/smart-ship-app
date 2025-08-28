@@ -32,7 +32,7 @@ export default function Home() {
           <div className='text-center mb-16'>
             <Badge className='mb-6 bg-blue-100 text-blue-800 hover:bg-blue-100'>
               <Truck className='w-4 h-4 mr-2' />
-              India's #1 Logistics Platform
+              India&apos;s #1 Logistics Platform
             </Badge>
             <h1 className='text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight'>
               Ship Smart,

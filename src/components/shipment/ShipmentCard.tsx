@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/Button';
-import { Package, MapPin, Clock, IndianRupee } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Clock, IndianRupee, MapPin, Package } from 'lucide-react';
 
 interface ShipmentCardProps {
-  id: string;
+  id?: string;
   trackingNumber: string;
   status: 'pending' | 'picked' | 'in-transit' | 'delivered' | 'cancelled';
   courierPartner: string;
@@ -25,7 +25,6 @@ const statusConfig = {
 };
 
 export function ShipmentCard({
-  id,
   trackingNumber,
   status,
   courierPartner,

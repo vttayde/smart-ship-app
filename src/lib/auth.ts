@@ -139,6 +139,7 @@ export const authOptions: NextAuthOptions = {
 
   events: {
     async signIn({ user, account }) {
+      /* eslint-disable */
       console.log('User signed in:', {
         userId: user.id,
         provider: account?.provider,

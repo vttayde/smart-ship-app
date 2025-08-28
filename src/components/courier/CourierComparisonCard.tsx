@@ -1,7 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/Button';
-import { Clock, Star, Shield, Truck } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Clock, Shield, Star, Truck } from 'lucide-react';
+import Image from 'next/image';
 
 interface CourierComparisonCardProps {
   name: string;
@@ -26,9 +27,8 @@ export function CourierComparisonCard({
 }: CourierComparisonCardProps) {
   return (
     <Card
-      className={`relative hover:shadow-lg transition-shadow ${
-        isRecommended ? 'ring-2 ring-blue-500' : ''
-      }`}
+      className={`relative hover:shadow-lg transition-shadow ${isRecommended ? 'ring-2 ring-blue-500' : ''
+        }`}
     >
       {isRecommended && (
         <div className='absolute -top-3 left-1/2 transform -translate-x-1/2'>
@@ -40,7 +40,7 @@ export function CourierComparisonCard({
         <div className='flex items-center justify-between'>
           <div className='flex items-center space-x-3'>
             {logo ? (
-              <img src={logo} alt={name} className='h-8 w-8' />
+              <Image src={logo} alt={name} width={32} height={32} />
             ) : (
               <Truck className='h-8 w-8 text-gray-400' />
             )}
