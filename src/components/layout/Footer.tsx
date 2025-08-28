@@ -54,7 +54,7 @@ export default function Footer() {
               <span className="text-xl font-bold text-gray-900">Ship Smart</span>
             </Link>
             <p className="text-gray-600 text-sm mb-4">
-              India's leading logistics aggregation platform. Compare courier services 
+              India&apos;s leading logistics aggregation platform. Compare courier services 
               and book shipments across the country with ease.
             </p>
             <div className="flex space-x-4">

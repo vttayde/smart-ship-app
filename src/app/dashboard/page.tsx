@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { signOut } from 'next-auth/react'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -17,10 +16,6 @@ export default function DashboardPage() {
       router.push('/auth/login')
     }
   }, [isAuthenticated, isLoading, router])
-
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' })
-  }
 
   if (isLoading) {
     return (
