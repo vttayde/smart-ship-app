@@ -1,9 +1,9 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { prisma } from "@/lib/prisma"
-import bcryptjs from "bcryptjs"
+// import GoogleProvider from "next-auth/providers/google"
+// import { PrismaAdapter } from "@next-auth/prisma-adapter"
+// import { prisma } from "@/lib/prisma"
+// import bcryptjs from "bcryptjs"
 
 // Extend NextAuth types
 declare module "next-auth" {
@@ -37,25 +37,25 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  // adapter: PrismaAdapter(prisma), // Disabled for development
   providers: [
-    // Google OAuth Provider
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-          role: "USER",
-          emailVerified: profile.email_verified ? new Date() : null,
-        }
-      },
-    }),
+    // Google OAuth Provider (disabled for now)
+    // GoogleProvider({
+    //   clientId: process.env.GOOGLE_CLIENT_ID!,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    //   profile(profile) {
+    //     return {
+    //       id: profile.sub,
+    //       name: profile.name,
+    //       email: profile.email,
+    //       image: profile.picture,
+    //       role: "USER",
+    //       emailVerified: profile.email_verified ? new Date() : null,
+    //     }
+    //   },
+    // }),
 
-    // Email/Password Provider
+    // Email/Password Provider with demo users
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -67,35 +67,37 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email and password are required")
         }
 
-        try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email.toLowerCase() }
-          })
-
-          if (!user || !user.passwordHash) {
-            throw new Error("Invalid email or password")
+        // Demo users for development
+        const demoUsers = [
+          {
+            id: "1",
+            email: "demo@smartship.com",
+            password: "demo123",
+            name: "Demo User",
+            role: "USER"
+          },
+          {
+            id: "2", 
+            email: "admin@smartship.com",
+            password: "admin123",
+            name: "Admin User",
+            role: "ADMIN"
           }
+        ]
 
-          const isPasswordValid = await bcryptjs.compare(
-            credentials.password,
-            user.passwordHash
-          )
+        const user = demoUsers.find(u => u.email === credentials.email.toLowerCase())
 
-          if (!isPasswordValid) {
-            throw new Error("Invalid email or password")
-          }
+        if (!user || user.password !== credentials.password) {
+          throw new Error("Invalid email or password")
+        }
 
-          return {
-            id: user.id,
-            email: user.email,
-            name: `${user.firstName} ${user.lastName}`.trim() || null,
-            image: null,
-            role: "USER",
-            emailVerified: user.emailVerified ? new Date() : null,
-          }
-        } catch (error) {
-          console.error("Authentication error:", error)
-          throw new Error("Authentication failed")
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: null,
+          role: user.role,
+          emailVerified: new Date(),
         }
       }
     })
