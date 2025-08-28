@@ -2,28 +2,26 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAppSelector, useAppDispatch } from '@/store/hooks'
-import { logout } from '@/store/slices/authSlice'
+import { signOut } from 'next-auth/react'
+import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 export default function DashboardPage() {
   const router = useRouter()
-  const dispatch = useAppDispatch()
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth)
+  const { user, isAuthenticated, isLoading } = useAuth()
 
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/auth/login')
     }
-  }, [isAuthenticated, user, router])
+  }, [isAuthenticated, isLoading, router])
 
-  const handleLogout = () => {
-    dispatch(logout())
-    router.push('/')
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' })
   }
 
-  if (!isAuthenticated || !user) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -42,7 +40,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center h-16">
             <h1 className="text-2xl font-bold text-gray-900">📦 Ship Smart</h1>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Welcome, {user.firstName}!</span>
+              <span className="text-gray-700">Welcome, {user?.name || user?.email}!</span>
               <Button variant="outline" onClick={handleLogout}>
                 Logout
               </Button>
@@ -56,7 +54,7 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user.firstName}!
+            Welcome back, {user?.name || user?.email}!
           </h2>
           <p className="text-gray-600">
             Manage your shipments and track your packages from your dashboard.

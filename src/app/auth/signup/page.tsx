@@ -3,16 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { loginStart, loginSuccess, loginFailure } from '@/store/slices/authSlice'
+import { signIn } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
+import { validateEmail, validatePassword, validatePhone } from '@/lib/auth-utils'
 
 export default function SignupPage() {
   const router = useRouter()
-  const dispatch = useAppDispatch()
-  const { isLoading, error } = useAppSelector((state) => state.auth)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -44,24 +44,31 @@ export default function SignupPage() {
 
     if (!formData.firstName.trim()) errors.firstName = 'First name is required'
     if (!formData.lastName.trim()) errors.lastName = 'Last name is required'
-    if (!formData.email.trim()) errors.email = 'Email is required'
-    if (!formData.phone.trim()) errors.phone = 'Phone number is required'
-    if (!formData.password) errors.password = 'Password is required'
-    if (formData.password.length < 6) errors.password = 'Password must be at least 6 characters'
+    
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required'
+    } else if (!validateEmail(formData.email)) {
+      errors.email = 'Invalid email format'
+    }
+    
+    if (formData.phone && !validatePhone(formData.phone)) {
+      errors.phone = 'Invalid phone number format'
+    }
+    
+    if (!formData.password) {
+      errors.password = 'Password is required'
+    } else {
+      const passwordValidation = validatePassword(formData.password)
+      if (!passwordValidation.isValid) {
+        errors.password = passwordValidation.errors[0]
+      }
+    }
+    
     if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match'
     }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (formData.email && !emailRegex.test(formData.email)) {
-      errors.email = 'Please enter a valid email address'
-    }
-
-    // Phone validation (basic)
-    const phoneRegex = /^[6-9]\d{9}$/
-    if (formData.phone && !phoneRegex.test(formData.phone)) {
-      errors.phone = 'Please enter a valid 10-digit mobile number'
+    if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match'
     }
 
     setFormErrors(errors)
@@ -73,28 +80,48 @@ export default function SignupPage() {
     
     if (!validateForm()) return
 
-    dispatch(loginStart())
+    setIsLoading(true)
+    setError('')
 
     try {
-      // TODO: Replace with actual API call
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // Mock successful registration
-      const newUser = {
-        id: '1',
-        email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        emailVerified: false,
-        phoneVerified: false
+      // Call signup API
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone || undefined,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed')
       }
-      
-      dispatch(loginSuccess(newUser))
-      router.push('/dashboard')
-    } catch (err) {
-      dispatch(loginFailure('Registration failed. Please try again.'))
+
+      // Auto-login after successful signup
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        // If auto-login fails, redirect to login page
+        router.push('/auth/login?message=Registration successful. Please log in.')
+      } else {
+        router.push('/dashboard')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Registration failed. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 

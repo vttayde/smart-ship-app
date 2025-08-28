@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and profile management
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  phone         String?   @unique
+  firstName     String
+  lastName      String
+  emailVerified Boolean   @default(false)
+  phoneVerified Boolean   @default(false)
+  passwordHash  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  addresses     Address[]
+  orders        Order[]
+  
+  @@map("users")
+}
+
+// Address model for pickup and delivery addresses
+model Address {
+  id           String  @id @default(cuid())
+  userId       String
+  type         String  // 'home', 'work', 'other'
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  pincode      String
+  latitude     Float?
+  longitude    Float?
+  isDefault    Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pickupOrders Order[] @relation("PickupAddress")
+  deliveryOrders Order[] @relation("DeliveryAddress")
+  
+  @@map("addresses")
+}
+
+// Courier Partners model
+model CourierPartner {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  apiEndpoint   String?
+  apiKey        String?
+  pricingModel  Json?    // Store pricing configuration as JSON
+  coverageAreas String[] // Array of supported pincodes/cities
+  isActive      Boolean  @default(true)
+  rating        Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  orders        Order[]
+  
+  @@map("courier_partners")
+}
+
+// Order model for shipment bookings
+model Order {
+  id                String    @id @default(cuid())
+  userId            String
+  courierPartnerId  String
+  pickupAddressId   String
+  deliveryAddressId String
+  
+  // Order details
+  trackingNumber    String?   @unique
+  status            String    @default("pending") // pending, confirmed, picked_up, in_transit, delivered, cancelled
+  totalAmount       Float
+  weight            Float
+  packageType       String    // document, package, fragile, etc.
+  declaredValue     Float?
+  
+  // Parcel details
+  parcelContents    String?
+  dimensions        Json?     // {length, width, height}
+  
+  // Delivery details
+  estimatedDelivery DateTime?
+  actualDelivery    DateTime?
+  deliveryInstructions String?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  user              User            @relation(fields: [userId], references: [id])
+  courierPartner    CourierPartner  @relation(fields: [courierPartnerId], references: [id])
+  pickupAddress     Address         @relation("PickupAddress", fields: [pickupAddressId], references: [id])
+  deliveryAddress   Address         @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
+  payments          Payment[]
+  orderLogs         OrderLog[]
+  trackingUpdates   OrderTracking[]
+  
+  @@map("orders")
+}
+
+// Payment model for transaction management
+model Payment {
+  id          String   @id @default(cuid())
+  orderId     String
+  paymentId   String?  // Payment gateway transaction ID
+  amount      Float
+  status      String   @default("pending") // pending, completed, failed, refunded
+  gateway     String   // razorpay, stripe, etc.
+  gatewayRef  String?  // Gateway reference number
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  order       Order    @relation(fields: [orderId], references: [id])
+  
+  @@map("payments")
+}
+
+// Order tracking model for real-time updates
+model OrderTracking {
+  id        String   @id @default(cuid())
+  orderId   String
+  status    String   // picked_up, in_transit, out_for_delivery, delivered
+  location  String?  // Current location description
+  latitude  Float?
+  longitude Float?
+  message   String?
+  timestamp DateTime @default(now())
+
+  // Relations
+  order     Order    @relation(fields: [orderId], references: [id])
+  
+  @@map("order_tracking")
+}
+
+// Order logs for audit trail
+model OrderLog {
+  id        String   @id @default(cuid())
+  orderId   String
+  status    String
+  message   String
+  createdBy String?  // User ID or system
+  timestamp DateTime @default(now())
+
+  // Relations
+  order     Order    @relation(fields: [orderId], references: [id])
+  
+  @@map("order_logs")
+}

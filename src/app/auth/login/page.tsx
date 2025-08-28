@@ -3,16 +3,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { loginStart, loginSuccess, loginFailure } from '@/store/slices/authSlice'
+import { signIn, getSession } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 
 export default function LoginPage() {
   const router = useRouter()
-  const dispatch = useAppDispatch()
-  const { isLoading, error } = useAppSelector((state) => state.auth)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   
   const [formData, setFormData] = useState({
     email: '',
@@ -28,27 +27,30 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    dispatch(loginStart())
+    setIsLoading(true)
+    setError('')
 
     try {
-      // TODO: Replace with actual API call
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Mock successful login
-      const mockUser = {
-        id: '1',
+      const result = await signIn('credentials', {
         email: formData.email,
-        firstName: 'John',
-        lastName: 'Doe',
-        emailVerified: true,
-        phoneVerified: false
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError('Invalid credentials. Please try again.')
+      } else {
+        // Wait for session to update
+        const session = await getSession()
+        if (session) {
+          router.push('/dashboard')
+          router.refresh()
+        }
       }
-      
-      dispatch(loginSuccess(mockUser))
-      router.push('/dashboard')
     } catch (error) {
-      dispatch(loginFailure('Invalid credentials. Please try again.'))
+      setError('An error occurred. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
