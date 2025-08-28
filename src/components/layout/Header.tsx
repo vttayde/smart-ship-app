@@ -1,29 +1,17 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
-import { LucideIcon } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import {
-  User,
-  LogOut,
-  Package,
-  History,
-  Settings,
-  Menu,
-  X,
-  Truck,
   BarChart3,
-  CreditCard,
   Bell,
-  ChevronDown,
-  Search,
-  Plus,
+  ChevronDown, History, LogOut, LucideIcon, Menu, Package, Plus, Search, Settings, Truck, User, X
 } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface NavigationItem {
   name: string;
@@ -52,16 +40,16 @@ export default function Header() {
 
   const dashboardNavigationItems: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Ship Now', href: '/dashboard/ship', icon: Plus },
-    { name: 'My Shipments', href: '/dashboard/shipments', icon: Package },
-    { name: 'Tracking', href: '/dashboard/tracking', icon: Search },
-    { name: 'History', href: '/dashboard/history', icon: History },
+    { name: 'Ship Now', href: '/ship', icon: Plus },
+    { name: 'My Orders', href: '/orders', icon: Package },
+    { name: 'Quotes', href: '/quotes', icon: Search },
+    { name: 'Profile', href: '/profile', icon: User },
   ];
 
   const userMenuItems: NavigationItem[] = [
-    { name: 'Profile', href: '/dashboard/profile', icon: User },
-    { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+    { name: 'My Profile', href: '/profile', icon: User },
+    { name: 'Order History', href: '/orders', icon: History },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
   const isDashboard = pathname?.startsWith('/dashboard');
@@ -96,11 +84,10 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive
+                  className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive
                       ? 'bg-blue-50 text-blue-700 border border-blue-200'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   {item.icon && <item.icon className='w-4 h-4' />}
                   <span>{item.name}</span>
@@ -214,11 +201,10 @@ export default function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center space-x-3 px-3 py-2 text-base font-medium rounded-md ${
-                      isActive
+                    className={`flex items-center space-x-3 px-3 py-2 text-base font-medium rounded-md ${isActive
                         ? 'bg-blue-50 text-blue-700 border border-blue-200'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
+                      }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item.icon && <item.icon className='w-5 h-5' />}
