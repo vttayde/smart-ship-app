@@ -15,6 +15,7 @@ A modern logistics platform that connects consumers with multiple courier servic
 ## 🏗️ Technology Stack
 
 ### **Frontend & Backend**
+
 - **Framework**: Next.js 15 + TypeScript (Full-stack)
 - **Frontend**: React components, App Router, Server-Side Rendering
 - **Backend**: Next.js API Routes (serverless functions)
@@ -25,6 +26,7 @@ A modern logistics platform that connects consumers with multiple courier servic
 - **Deployment**: Vercel
 
 ### **Integrations (Planned)**
+
 - **Payment**: Razorpay Gateway
 - **Maps**: Google Maps API
 - **SMS/Email**: Twilio + SendGrid
@@ -33,24 +35,28 @@ A modern logistics platform that connects consumers with multiple courier servic
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 - Git
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/vttayde/smart-ship-app.git
    cd smart-ship-app
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Run the development server**
+
    ```bash
    npm run dev
    ```
@@ -88,6 +94,7 @@ ship-smart/
 ## 🎨 Features Implemented (Phase 1)
 
 ### ✅ **Core Features**
+
 - [x] **Landing Page** - Professional homepage with search functionality
 - [x] **Authentication UI** - Login and signup pages with form validation
 - [x] **User Dashboard** - Basic dashboard with stats and quick actions
@@ -96,6 +103,7 @@ ship-smart/
 - [x] **UI Components** - Reusable Button, Input, and Card components
 
 ### ✅ **User Experience**
+
 - [x] **Guest Browsing** - Search and compare without authentication
 - [x] **Authentication Gate** - Login required only for booking
 - [x] **Professional UI** - Clean, modern design
@@ -104,12 +112,14 @@ ship-smart/
 ## 🔮 Roadmap
 
 ### **Phase 2: Backend & Database (Planned)**
+
 - [ ] PostgreSQL database setup with Prisma
 - [ ] Authentication system with NextAuth.js
 - [ ] API routes for user management
 - [ ] Session management and security
 
 ### **Phase 3: Courier Integration (Planned)**
+
 - [ ] Delhivery API integration
 - [ ] Shadowfax API integration
 - [ ] Ekart API integration
@@ -117,12 +127,14 @@ ship-smart/
 - [ ] Service availability checking
 
 ### **Phase 4: Booking & Payments (Planned)**
+
 - [ ] Booking flow implementation
 - [ ] Razorpay payment integration
 - [ ] Order management system
 - [ ] Email/SMS notifications
 
 ### **Phase 5: Advanced Features (Planned)**
+
 - [ ] Real-time tracking with GPS
 - [ ] Advanced analytics dashboard
 - [ ] Admin panel for operations
@@ -131,6 +143,7 @@ ship-smart/
 ## 🧪 Development
 
 ### **Available Scripts**
+
 ```bash
 npm run dev      # Start development server
 npm run build    # Build for production
@@ -139,6 +152,7 @@ npm run lint     # Run ESLint
 ```
 
 ### **Development Guidelines**
+
 - Follow TypeScript best practices
 - Use Tailwind CSS for styling
 - Implement proper error handling
@@ -148,6 +162,7 @@ npm run lint     # Run ESLint
 ## 📚 Documentation
 
 Detailed project documentation is available in the `/project-docs` folder:
+
 - **PROJECT_ANALYSIS.md** - Technical analysis and requirements
 - **LEARNING_GUIDE.md** - Development tutorials and resources
 - **NEXTJS_IMPLEMENTATION.md** - Implementation details

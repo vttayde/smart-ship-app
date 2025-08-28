@@ -1,22 +1,22 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { StoreProvider } from "@/providers/StoreProvider";
-import AuthProvider from "@/providers/AuthProvider";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import { StoreProvider } from '@/providers/StoreProvider';
+import AuthProvider from '@/providers/AuthProvider';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Ship Smart - Logistics Platform",
-  description: "Compare courier services and book shipments across India",
+  title: 'Ship Smart - Logistics Platform',
+  description: 'Compare courier services and book shipments across India',
 };
 
 export default function RootLayout({
@@ -25,14 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang='en'>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <StoreProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </StoreProvider>
       </body>
     </html>

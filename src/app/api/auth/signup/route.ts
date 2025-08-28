@@ -1,61 +1,49 @@
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { hashPassword, validateEmail, validatePassword, validatePhone } from "@/lib/auth-utils"
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { hashPassword, validateEmail, validatePassword, validatePhone } from '@/lib/auth-utils';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, password, firstName, lastName, phone } = body
+    const body = await request.json();
+    const { email, password, firstName, lastName, phone } = body;
 
     // Validation
     if (!email || !password || !firstName || !lastName) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     if (!validateEmail(email)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    const passwordValidation = validatePassword(password)
+    const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { error: "Invalid password", details: passwordValidation.errors },
+        { error: 'Invalid password', details: passwordValidation.errors },
         { status: 400 }
-      )
+      );
     }
 
     if (phone && !validatePhone(phone)) {
-      return NextResponse.json(
-        { error: "Invalid phone number format" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid phone number format' }, { status: 400 });
     }
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [
-          { email },
-          ...(phone ? [{ phone }] : [])
-        ]
-      }
-    })
+        OR: [{ email }, ...(phone ? [{ phone }] : [])],
+      },
+    });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "User already exists with this email or phone number" },
+        { error: 'User already exists with this email or phone number' },
         { status: 409 }
-      )
+      );
     }
 
     // Hash password and create user
-    const passwordHash = await hashPassword(password)
+    const passwordHash = await hashPassword(password);
 
     const user = await prisma.user.create({
       data: {
@@ -64,25 +52,21 @@ export async function POST(request: NextRequest) {
         firstName,
         lastName,
         phone: phone || null,
-      }
-    })
+      },
+    });
 
     // Return user without password
-    const { passwordHash: _, ...userWithoutPassword } = user
+    const { passwordHash: _, ...userWithoutPassword } = user;
 
     return NextResponse.json(
       {
-        message: "User created successfully",
-        user: userWithoutPassword
+        message: 'User created successfully',
+        user: userWithoutPassword,
       },
       { status: 201 }
-    )
-
+    );
   } catch (error) {
-    console.error("Signup error:", error)
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    )
+    console.error('Signup error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,9 +1,9 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...')
+  console.log('🌱 Seeding database...');
 
   // Create courier partners
   const delhivery = await prisma.courierPartner.upsert({
@@ -14,13 +14,13 @@ async function main() {
       pricingModel: {
         basePrice: 40,
         perKgRate: 20,
-        fuelSurcharge: 0.1
+        fuelSurcharge: 0.1,
       },
       coverageAreas: ['400001', '110001', '560001', '600001'], // Mumbai, Delhi, Bangalore, Chennai
       isActive: true,
-      rating: 4.2
-    }
-  })
+      rating: 4.2,
+    },
+  });
 
   const shadowfax = await prisma.courierPartner.upsert({
     where: { name: 'Shadowfax' },
@@ -31,13 +31,13 @@ async function main() {
         basePrice: 50,
         perKgRate: 25,
         sameDayDelivery: true,
-        expressCharge: 30
+        expressCharge: 30,
       },
       coverageAreas: ['400001', '110001', '560001', '411001'], // Mumbai, Delhi, Bangalore, Pune
       isActive: true,
-      rating: 4.5
-    }
-  })
+      rating: 4.5,
+    },
+  });
 
   const ekart = await prisma.courierPartner.upsert({
     where: { name: 'Ekart' },
@@ -47,28 +47,28 @@ async function main() {
       pricingModel: {
         basePrice: 35,
         perKgRate: 18,
-        budgetFriendly: true
+        budgetFriendly: true,
       },
       coverageAreas: ['400001', '110001', '560001', '600001', '700001'], // Major cities
       isActive: true,
-      rating: 4.0
-    }
-  })
+      rating: 4.0,
+    },
+  });
 
   console.log('✅ Created courier partners:', {
     delhivery: delhivery.id,
     shadowfax: shadowfax.id,
-    ekart: ekart.id
-  })
+    ekart: ekart.id,
+  });
 
-  console.log('🎉 Database seeding completed!')
+  console.log('🎉 Database seeding completed!');
 }
 
 main()
-  .catch((e) => {
-    console.error('❌ Error seeding database:', e)
-    process.exit(1)
+  .catch(e => {
+    console.error('❌ Error seeding database:', e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });
