@@ -6,6 +6,7 @@ import { signOut } from 'next-auth/react'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import Layout from '@/components/layout/Layout'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -33,33 +34,19 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-gray-900">📦 Ship Smart</h1>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Welcome, {user?.name || user?.email}!</span>
-              <Button variant="outline" onClick={handleLogout}>
-                Logout
-              </Button>
-            </div>
+    <Layout showFooter={false}>
+      <div className="min-h-screen bg-gray-50">
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          {/* Welcome Section */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome back, {user?.name || user?.email}!
+            </h2>
+            <p className="text-gray-600">
+              Manage your shipments and track your packages from your dashboard.
+            </p>
           </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.name || user?.email}!
-          </h2>
-          <p className="text-gray-600">
-            Manage your shipments and track your packages from your dashboard.
-          </p>
-        </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -106,8 +93,9 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/book')}>
-            <CardContent className="p-6">
+          <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/book')}>
+            <Card>
+              <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="bg-blue-100 p-3 rounded-lg">
                   <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,9 +109,11 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+          </div>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/tracking')}>
-            <CardContent className="p-6">
+          <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/tracking')}>
+            <Card>
+              <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="bg-green-100 p-3 rounded-lg">
                   <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,9 +127,11 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+          </div>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/history')}>
-            <CardContent className="p-6">
+          <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/history')}>
+            <Card>
+              <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="bg-purple-100 p-3 rounded-lg">
                   <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,6 +145,7 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
 
         {/* Recent Orders */}
@@ -233,7 +226,8 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+        </main>
+      </div>
+    </Layout>
   )
 }
