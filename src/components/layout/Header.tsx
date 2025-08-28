@@ -116,7 +116,7 @@ export default function Header() {
                 {/* Notifications */}
                 <button className='relative p-2 text-gray-400 hover:text-gray-600 transition-colors'>
                   <Bell className='w-5 h-5' />
-                  <span className='absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400'></span>
+                  <span className='absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400' />
                 </button>
 
                 {/* Quick Ship Button */}

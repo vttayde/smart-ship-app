@@ -14,7 +14,10 @@ const eslintConfig = [
   {
     rules: {
       // TypeScript specific rules
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
 
       // React/Next.js specific rules

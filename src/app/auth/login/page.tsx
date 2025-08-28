@@ -157,7 +157,7 @@ export default function LoginPage() {
               <form onSubmit={handleSubmit} className='space-y-6'>
                 {error && (
                   <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2'>
-                    <div className='w-4 h-4 rounded-full bg-red-200 flex-shrink-0'></div>
+                    <div className='w-4 h-4 rounded-full bg-red-200 flex-shrink-0' />
                     <span>{error}</span>
                   </div>
                 )}

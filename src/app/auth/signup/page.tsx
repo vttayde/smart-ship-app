@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { Loading } from '@/components/ui/loading';
 import {
@@ -136,7 +136,7 @@ export default function SignupPage() {
         router.push('/dashboard');
         router.refresh();
       }
-    } catch (error) {
+    } catch (_error) {
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -209,8 +209,8 @@ export default function SignupPage() {
                 <span className='font-semibold'>4.9/5 Rating</span>
               </div>
               <p className='text-purple-100 italic'>
-                "Ship Smart has transformed our business logistics. We save 30% on shipping costs
-                and our customers love the tracking experience!"
+                &ldquo;Ship Smart has transformed our business logistics. We save 30% on shipping costs
+                and our customers love the tracking experience!&rdquo;
               </p>
               <div className='mt-3 text-sm'>
                 <span className='font-medium'>- Rajesh Kumar, TechCorp Solutions</span>
@@ -251,7 +251,7 @@ export default function SignupPage() {
               <form onSubmit={handleSubmit} className='space-y-6'>
                 {error && (
                   <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2'>
-                    <div className='w-4 h-4 rounded-full bg-red-200 flex-shrink-0'></div>
+                    <div className='w-4 h-4 rounded-full bg-red-200 flex-shrink-0' />
                     <span>{error}</span>
                   </div>
                 )}
