@@ -1,29 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/badge';
 import { Loading } from '@/components/ui/loading';
+import { validateEmail, validatePassword, validatePhone } from '@/lib/auth-utils';
 import {
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  User,
-  Phone,
   ArrowRight,
   CheckCircle,
-  Truck,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Phone,
   Shield,
   Star,
+  Truck,
+  User,
   UserPlus,
 } from 'lucide-react';
-import { validateEmail, validatePassword, validatePhone } from '@/lib/auth-utils';
+import { signIn } from 'next-auth/react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -136,7 +136,7 @@ export default function SignupPage() {
         router.push('/dashboard');
         router.refresh();
       }
-    } catch (_error) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
