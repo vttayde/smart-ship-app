@@ -5,16 +5,19 @@ This project uses ESLint and Prettier for code quality and consistent formatting
 ## Tools Configured
 
 ### ESLint
+
 - **Configuration**: `eslint.config.mjs`
 - **Rules**: Next.js TypeScript rules + custom quality rules
 - **Purpose**: Code quality, bug prevention, and consistency
 
 ### Prettier
+
 - **Configuration**: `.prettierrc`
 - **Purpose**: Automatic code formatting
 - **Settings**: 100 character line width, single quotes, trailing commas
 
 ### Lint-staged
+
 - **Configuration**: `package.json` under `lint-staged`
 - **Purpose**: Run linting and formatting on staged files before commit
 
@@ -40,6 +43,7 @@ npm run type-check
 ## VS Code Integration
 
 The `.vscode/settings.json` file is configured to:
+
 - Auto-format on save
 - Run ESLint fixes on save
 - Organize imports automatically
@@ -48,6 +52,7 @@ The `.vscode/settings.json` file is configured to:
 ## Recommended Extensions
 
 Install these VS Code extensions for the best experience:
+
 - ESLint
 - Prettier
 - TypeScript and JavaScript Language Features
@@ -57,6 +62,7 @@ Install these VS Code extensions for the best experience:
 ## Pre-commit Hooks
 
 The project uses lint-staged to automatically:
+
 1. Run ESLint with auto-fix on TypeScript/JavaScript files
 2. Format all files with Prettier
 3. Only commit if no errors remain
@@ -64,6 +70,7 @@ The project uses lint-staged to automatically:
 ## Rules Overview
 
 ### ESLint Rules
+
 - No unused variables (except those prefixed with `_`)
 - Warn on explicit `any` types
 - Prefer `const` over `let`
@@ -72,6 +79,7 @@ The project uses lint-staged to automatically:
 - TypeScript: proper variable declarations
 
 ### Prettier Rules
+
 - Single quotes for strings
 - Semicolons required
 - 100 character line width
