@@ -46,7 +46,7 @@ interface Address {
 }
 
 export default function ProfileManagement() {
-  const { data: session, update } = useSession()
+  const { update } = useSession()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -78,7 +78,7 @@ export default function ProfileManagement() {
       } else {
         setError('Failed to load profile')
       }
-    } catch (error) {
+    } catch {
       setError('Failed to load profile')
     } finally {
       setIsLoading(false)
@@ -117,7 +117,7 @@ export default function ProfileManagement() {
       } else {
         setError(data.errors ? Object.values(data.errors)[0] as string : 'Failed to update profile')
       }
-    } catch (error) {
+    } catch {
       setError('Failed to update profile')
     } finally {
       setIsSaving(false)
@@ -328,7 +328,7 @@ export default function ProfileManagement() {
                               {getAddressTypeLabel(address.type)}
                             </span>
                             {address.isDefault && (
-                              <Badge size="sm">Default</Badge>
+                              <Badge>Default</Badge>
                             )}
                           </div>
                           <p className="text-sm text-gray-600">

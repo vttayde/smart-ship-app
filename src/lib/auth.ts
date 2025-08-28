@@ -5,36 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 // import { prisma } from "@/lib/prisma"
 // import bcryptjs from "bcryptjs"
 
-// Extend NextAuth types
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string
-      email: string
-      name?: string | null
-      image?: string | null
-      role: string
-      emailVerified?: Date | null
-    }
-  }
-
-  interface User {
-    id: string
-    email: string
-    name?: string | null
-    image?: string | null
-    role: string
-    emailVerified?: Date | null
-  }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    id: string
-    role: string
-    emailVerified?: Date | null
-  }
-}
+// Note: NextAuth type extensions are handled automatically
 
 export const authOptions: NextAuthOptions = {
   // adapter: PrismaAdapter(prisma), // Disabled for development
@@ -118,8 +89,7 @@ export const authOptions: NextAuthOptions = {
       // Initial sign in
       if (user) {
         token.id = user.id
-        token.role = user.role
-        token.emailVerified = user.emailVerified
+        token.role = user.role as string
       }
 
       return token
@@ -127,9 +97,11 @@ export const authOptions: NextAuthOptions = {
     
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id
-        session.user.role = token.role
-        session.user.emailVerified = token.emailVerified
+        // Extend session.user with additional properties
+        Object.assign(session.user, {
+          id: token.id,
+          role: token.role
+        })
       }
       return session
     },
@@ -143,6 +115,12 @@ export const authOptions: NextAuthOptions = {
     },
 
     async redirect({ url, baseUrl }) {
+      // Prevent redirect loops
+      if (url === baseUrl) return baseUrl
+      
+      // If redirecting to login page, go to dashboard instead
+      if (url.includes('/auth/login')) return `${baseUrl}/dashboard`
+      
       // Allows relative callback URLs
       if (url.startsWith("/")) return `${baseUrl}${url}`
       
