@@ -209,8 +209,8 @@ export default function SignupPage() {
                 <span className='font-semibold'>4.9/5 Rating</span>
               </div>
               <p className='text-purple-100 italic'>
-                &ldquo;Ship Smart has transformed our business logistics. We save 30% on shipping costs
-                and our customers love the tracking experience!&rdquo;
+                &ldquo;Ship Smart has transformed our business logistics. We save 30% on shipping
+                costs and our customers love the tracking experience!&rdquo;
               </p>
               <div className='mt-3 text-sm'>
                 <span className='font-medium'>- Rajesh Kumar, TechCorp Solutions</span>

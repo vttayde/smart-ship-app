@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   /* eslint-disable */
-    console.log('🌱 Seeding database...');
+  console.log('🌱 Seeding database...');
 
   // Create courier partners
   const delhivery = await prisma.courierPartner.upsert({

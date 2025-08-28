@@ -41,17 +41,14 @@ export async function GET() {
     return NextResponse.json({ addresses: demoAddresses });
   } catch (error) {
     console.error('Error fetching addresses:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch addresses' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch addresses' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // For demo purposes, just return the submitted data with an ID
     const newAddress = {
       id: Math.random().toString(36).substr(2, 9),
@@ -60,15 +57,15 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date(),
     };
 
-    return NextResponse.json({ 
-      message: 'Address created successfully',
-      address: newAddress 
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        message: 'Address created successfully',
+        address: newAddress,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error creating address:', error);
-    return NextResponse.json(
-      { error: 'Failed to create address' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create address' }, { status: 500 });
   }
 }

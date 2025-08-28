@@ -15,7 +15,7 @@ import {
   Plus,
   Settings,
   TrendingUp,
-  Users
+  Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -51,7 +51,7 @@ export default function DashboardPage() {
     totalShipments: 0,
     inTransit: 0,
     delivered: 0,
-    totalSpent: 0
+    totalSpent: 0,
   });
   const [recentShipments, setRecentShipments] = useState<RecentShipment[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -72,7 +72,7 @@ export default function DashboardPage() {
           totalShipments: 12,
           inTransit: 3,
           delivered: 9,
-          totalSpent: 1250
+          totalSpent: 1250,
         });
 
         setRecentShipments([
@@ -82,7 +82,7 @@ export default function DashboardPage() {
             destination: 'Mumbai, Maharashtra',
             status: 'in_transit',
             createdAt: '2025-08-28T10:30:00Z',
-            amount: 120
+            amount: 120,
           },
           {
             id: '2',
@@ -90,7 +90,7 @@ export default function DashboardPage() {
             destination: 'Bangalore, Karnataka',
             status: 'delivered',
             createdAt: '2025-08-27T14:15:00Z',
-            amount: 85
+            amount: 85,
           },
           {
             id: '3',
@@ -98,8 +98,8 @@ export default function DashboardPage() {
             destination: 'Delhi, Delhi',
             status: 'pending',
             createdAt: '2025-08-26T09:45:00Z',
-            amount: 95
-          }
+            amount: 95,
+          },
         ]);
 
         setIsLoadingData(false);
@@ -115,12 +115,14 @@ export default function DashboardPage() {
       pending: { color: 'bg-yellow-100 text-yellow-800', text: 'Pending' },
       in_transit: { color: 'bg-blue-100 text-blue-800', text: 'In Transit' },
       delivered: { color: 'bg-green-100 text-green-800', text: 'Delivered' },
-      cancelled: { color: 'bg-red-100 text-red-800', text: 'Cancelled' }
+      cancelled: { color: 'bg-red-100 text-red-800', text: 'Cancelled' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+      <span
+        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}
+      >
         {config.text}
       </span>
     );
@@ -155,23 +157,22 @@ export default function DashboardPage() {
                   Welcome back, {user?.name || user?.email?.split('@')[0]}!
                 </h1>
                 <p className='text-gray-600 mt-1'>
-                  {isAdmin ? 'Admin Dashboard - Manage all system operations' : 'Manage your shipments and track your packages'}
+                  {isAdmin
+                    ? 'Admin Dashboard - Manage all system operations'
+                    : 'Manage your shipments and track your packages'}
                 </p>
               </div>
               <div className='flex items-center space-x-4'>
                 <Button
-                  variant="outline"
+                  variant='outline'
                   onClick={() => router.push('/profile')}
-                  className="flex items-center gap-2"
+                  className='flex items-center gap-2'
                 >
-                  <Settings className="w-4 h-4" />
+                  <Settings className='w-4 h-4' />
                   Profile
                 </Button>
-                <Button
-                  onClick={() => router.push('/ship')}
-                  className="flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
+                <Button onClick={() => router.push('/ship')} className='flex items-center gap-2'>
+                  <Plus className='w-4 h-4' />
                   New Shipment
                 </Button>
               </div>
@@ -183,26 +184,26 @@ export default function DashboardPage() {
         <main className='max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8'>
           {/* Stats Grid */}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className='hover:shadow-lg transition-shadow'>
               <CardHeader className='pb-2'>
                 <CardTitle className='text-sm font-medium text-gray-600 flex items-center gap-2'>
-                  <Package className="w-4 h-4" />
+                  <Package className='w-4 h-4' />
                   Total Shipments
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className='text-3xl font-bold text-gray-900'>{stats.totalShipments}</div>
                 <p className='text-xs text-gray-500 flex items-center gap-1 mt-1'>
-                  <TrendingUp className="w-3 h-3" />
+                  <TrendingUp className='w-3 h-3' />
                   +2 from last month
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className='hover:shadow-lg transition-shadow'>
               <CardHeader className='pb-2'>
                 <CardTitle className='text-sm font-medium text-gray-600 flex items-center gap-2'>
-                  <Clock className="w-4 h-4" />
+                  <Clock className='w-4 h-4' />
                   In Transit
                 </CardTitle>
               </CardHeader>
@@ -212,10 +213,10 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className='hover:shadow-lg transition-shadow'>
               <CardHeader className='pb-2'>
                 <CardTitle className='text-sm font-medium text-gray-600 flex items-center gap-2'>
-                  <CheckCircle className="w-4 h-4" />
+                  <CheckCircle className='w-4 h-4' />
                   Delivered
                 </CardTitle>
               </CardHeader>
@@ -225,59 +226,64 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className='hover:shadow-lg transition-shadow'>
               <CardHeader className='pb-2'>
                 <CardTitle className='text-sm font-medium text-gray-600 flex items-center gap-2'>
-                  <CreditCard className="w-4 h-4" />
+                  <CreditCard className='w-4 h-4' />
                   Total Spent
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className='text-3xl font-bold text-gray-900'>₹{stats.totalSpent.toLocaleString()}</div>
+                <div className='text-3xl font-bold text-gray-900'>
+                  ₹{stats.totalSpent.toLocaleString()}
+                </div>
                 <p className='text-xs text-gray-500'>This month</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Recent Shipments */}
-          <Card className="mb-8">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5" />
+          <Card className='mb-8'>
+            <CardHeader className='flex flex-row items-center justify-between'>
+              <CardTitle className='flex items-center gap-2'>
+                <Package className='w-5 h-5' />
                 Recent Shipments
               </CardTitle>
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={() => router.push('/orders')}
-                className="flex items-center gap-2"
+                className='flex items-center gap-2'
               >
-                <Eye className="w-4 h-4" />
+                <Eye className='w-4 h-4' />
                 View All
               </Button>
             </CardHeader>
             <CardContent>
               {recentShipments.length > 0 ? (
-                <div className="space-y-4">
-                  {recentShipments.map((shipment) => (
-                    <div key={shipment.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <code className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                <div className='space-y-4'>
+                  {recentShipments.map(shipment => (
+                    <div
+                      key={shipment.id}
+                      className='flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors'
+                    >
+                      <div className='flex-1'>
+                        <div className='flex items-center gap-3 mb-2'>
+                          <code className='text-sm font-mono bg-gray-100 px-2 py-1 rounded'>
                             {shipment.trackingNumber}
                           </code>
                           {getStatusBadge(shipment.status)}
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <MapPin className="w-4 h-4" />
+                        <div className='flex items-center gap-2 text-sm text-gray-600'>
+                          <MapPin className='w-4 h-4' />
                           <span>To: {shipment.destination}</span>
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className='text-xs text-gray-500 mt-1'>
                           {new Date(shipment.createdAt).toLocaleDateString()}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-semibold text-gray-900">₹{shipment.amount}</div>
-                        <Button variant="outline" size="sm" className="mt-2">
+                      <div className='text-right'>
+                        <div className='font-semibold text-gray-900'>₹{shipment.amount}</div>
+                        <Button variant='outline' size='sm' className='mt-2'>
                           Track
                         </Button>
                       </div>
@@ -285,13 +291,10 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">No shipments yet</p>
-                  <Button
-                    className="mt-4"
-                    onClick={() => router.push('/ship')}
-                  >
+                <div className='text-center py-8'>
+                  <Package className='w-12 h-12 text-gray-400 mx-auto mb-4' />
+                  <p className='text-gray-600'>No shipments yet</p>
+                  <Button className='mt-4' onClick={() => router.push('/ship')}>
                     Create Your First Shipment
                   </Button>
                 </div>
@@ -301,45 +304,60 @@ export default function DashboardPage() {
 
           {/* Admin Section */}
           {isAdmin && (
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5" />
+            <div className='mb-8'>
+              <h2 className='text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+                <Users className='w-5 h-5' />
                 Admin Panel
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/users')}>
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                <div
+                  className='hover:shadow-lg transition-shadow cursor-pointer'
+                  onClick={() => router.push('/admin/users')}
+                >
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <Users className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                      <h3 className="font-semibold mb-2">User Management</h3>
-                      <p className="text-sm text-gray-600 mb-4">Manage user accounts and permissions</p>
-                      <Button variant="outline" className="w-full">
+                    <CardContent className='p-6 text-center'>
+                      <Users className='w-8 h-8 text-blue-600 mx-auto mb-3' />
+                      <h3 className='font-semibold mb-2'>User Management</h3>
+                      <p className='text-sm text-gray-600 mb-4'>
+                        Manage user accounts and permissions
+                      </p>
+                      <Button variant='outline' className='w-full'>
                         Manage Users
                       </Button>
                     </CardContent>
                   </Card>
                 </div>
 
-                <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/analytics')}>
+                <div
+                  className='hover:shadow-lg transition-shadow cursor-pointer'
+                  onClick={() => router.push('/admin/analytics')}
+                >
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <BarChart3 className="w-8 h-8 text-green-600 mx-auto mb-3" />
-                      <h3 className="font-semibold mb-2">Analytics</h3>
-                      <p className="text-sm text-gray-600 mb-4">View system analytics and reports</p>
-                      <Button variant="outline" className="w-full">
+                    <CardContent className='p-6 text-center'>
+                      <BarChart3 className='w-8 h-8 text-green-600 mx-auto mb-3' />
+                      <h3 className='font-semibold mb-2'>Analytics</h3>
+                      <p className='text-sm text-gray-600 mb-4'>
+                        View system analytics and reports
+                      </p>
+                      <Button variant='outline' className='w-full'>
                         View Analytics
                       </Button>
                     </CardContent>
                   </Card>
                 </div>
 
-                <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/settings')}>
+                <div
+                  className='hover:shadow-lg transition-shadow cursor-pointer'
+                  onClick={() => router.push('/admin/settings')}
+                >
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <Settings className="w-8 h-8 text-purple-600 mx-auto mb-3" />
-                      <h3 className="font-semibold mb-2">System Settings</h3>
-                      <p className="text-sm text-gray-600 mb-4">Configure system settings and preferences</p>
-                      <Button variant="outline" className="w-full">
+                    <CardContent className='p-6 text-center'>
+                      <Settings className='w-8 h-8 text-purple-600 mx-auto mb-3' />
+                      <h3 className='font-semibold mb-2'>System Settings</h3>
+                      <p className='text-sm text-gray-600 mb-4'>
+                        Configure system settings and preferences
+                      </p>
+                      <Button variant='outline' className='w-full'>
                         Settings
                       </Button>
                     </CardContent>
@@ -352,34 +370,43 @@ export default function DashboardPage() {
           {/* Quick Actions for Regular Users */}
           {!isAdmin && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/ship')}>
+              <h2 className='text-xl font-semibold text-gray-900 mb-4'>Quick Actions</h2>
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                <div
+                  className='hover:shadow-lg transition-shadow cursor-pointer'
+                  onClick={() => router.push('/ship')}
+                >
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <Plus className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                      <h3 className="font-semibold mb-2">Ship Package</h3>
-                      <p className="text-sm text-gray-600">Get quotes and book shipment</p>
+                    <CardContent className='p-6 text-center'>
+                      <Plus className='w-8 h-8 text-blue-600 mx-auto mb-3' />
+                      <h3 className='font-semibold mb-2'>Ship Package</h3>
+                      <p className='text-sm text-gray-600'>Get quotes and book shipment</p>
                     </CardContent>
                   </Card>
                 </div>
 
-                <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/track')}>
+                <div
+                  className='hover:shadow-lg transition-shadow cursor-pointer'
+                  onClick={() => router.push('/track')}
+                >
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <Eye className="w-8 h-8 text-green-600 mx-auto mb-3" />
-                      <h3 className="font-semibold mb-2">Track Package</h3>
-                      <p className="text-sm text-gray-600">Track your shipments</p>
+                    <CardContent className='p-6 text-center'>
+                      <Eye className='w-8 h-8 text-green-600 mx-auto mb-3' />
+                      <h3 className='font-semibold mb-2'>Track Package</h3>
+                      <p className='text-sm text-gray-600'>Track your shipments</p>
                     </CardContent>
                   </Card>
                 </div>
 
-                <div className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/profile')}>
+                <div
+                  className='hover:shadow-lg transition-shadow cursor-pointer'
+                  onClick={() => router.push('/profile')}
+                >
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <Settings className="w-8 h-8 text-purple-600 mx-auto mb-3" />
-                      <h3 className="font-semibold mb-2">Profile Settings</h3>
-                      <p className="text-sm text-gray-600">Manage your account</p>
+                    <CardContent className='p-6 text-center'>
+                      <Settings className='w-8 h-8 text-purple-600 mx-auto mb-3' />
+                      <h3 className='font-semibold mb-2'>Profile Settings</h3>
+                      <p className='text-sm text-gray-600'>Manage your account</p>
                     </CardContent>
                   </Card>
                 </div>
