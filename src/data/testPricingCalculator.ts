@@ -1,7 +1,10 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // Test file to validate pricing calculator functionality
 
-import { pricingCalculator } from '@/data/pricingCalculator';
 import { SAMPLE_SHIPPING_REQUESTS } from '@/data/mockData';
+import { pricingCalculator } from '@/data/pricingCalculator';
 
 // Test pricing calculator with sample requests
 export function testPricingCalculator() {
