@@ -73,28 +73,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run npm audit
-        run: npm audit --audit-level=high
-        continue-on-error: true
-
-      - name: Check for vulnerable dependencies
+      - name: Run dependency security audit
         run: |
-          echo "Checking for high severity vulnerabilities..."
-          npm audit --audit-level=high --json > audit-results.json || true
+          echo "🔍 Running dependency security audit..."
           
-          # Check if there are high severity vulnerabilities
-          high_vulns=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
-          critical_vulns=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
-          
-          echo "High severity vulnerabilities: $high_vulns"
-          echo "Critical severity vulnerabilities: $critical_vulns"
-          
-          if [ "$high_vulns" -gt 0 ] || [ "$critical_vulns" -gt 0 ]; then
-            echo "❌ Found high or critical severity vulnerabilities!"
-            npm audit --audit-level=high
-            exit 1
+          # Run npm audit and capture exit code
+          if npm audit --audit-level=moderate; then
+            echo "✅ No moderate or higher vulnerabilities found"
           else
-            echo "✅ No high or critical severity vulnerabilities found"
+            echo "⚠️ Found vulnerabilities, checking severity..."
+            
+            # Run detailed audit for high/critical only
+            if npm audit --audit-level=high; then
+              echo "ℹ️ Only low/moderate vulnerabilities found - continuing"
+            else
+              echo "❌ High or critical vulnerabilities found!"
+              echo "Please run 'npm audit fix' to resolve security issues"
+              exit 1
+            fi
           fi
 
   license-check:

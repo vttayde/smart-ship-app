@@ -81,8 +81,9 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'fallback-secret-for-ci-build-only' }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL || 'http://localhost:3000' }}
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/testdb"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
