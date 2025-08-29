@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   jwt: {
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-build',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
@@ -115,20 +115,29 @@ export const authOptions: NextAuthOptions = {
     },
 
     async redirect({ url, baseUrl }) {
+      // Ensure baseUrl has a fallback during build
+      const fallbackBaseUrl = baseUrl || process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      
       // Prevent redirect loops
-      if (url === baseUrl) return baseUrl;
+      if (url === fallbackBaseUrl) return fallbackBaseUrl;
 
       // If redirecting to login page, go to dashboard instead
-      if (url.includes('/auth/login')) return `${baseUrl}/dashboard`;
+      if (url.includes('/auth/login')) return `${fallbackBaseUrl}/dashboard`;
 
       // Allows relative callback URLs
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      if (url.startsWith('/')) return `${fallbackBaseUrl}${url}`;
 
       // Allows callback URLs on the same origin
-      if (new URL(url).origin === baseUrl) return url;
+      try {
+        if (new URL(url).origin === fallbackBaseUrl) return url;
+      } catch {
+        // If URL parsing fails, return fallback
+        console.warn('Invalid URL in redirect callback:', url);
+        return `${fallbackBaseUrl}/dashboard`;
+      }
 
       // Default redirect to dashboard after sign in
-      return `${baseUrl}/dashboard`;
+      return `${fallbackBaseUrl}/dashboard`;
     },
   },
 
