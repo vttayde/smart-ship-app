@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import CityAutocomplete from '@/components/location/CityAutocomplete';
+import PaymentModal from '@/components/PaymentModal';
 import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Loading } from '@/components/ui/loading';
 import {
@@ -13,11 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import CityAutocomplete from '@/components/location/CityAutocomplete';
 import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/hooks/useProfile';
 import { useCourierPartners } from '@/hooks/useCourierPartners';
-import { Package, ArrowRight, Calculator, User, CreditCard } from 'lucide-react';
+import { useProfile } from '@/hooks/useProfile';
+import { ArrowRight, Calculator, CreditCard, Package, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface CityLocation {
   city: string;
@@ -86,6 +87,14 @@ export default function ShippingQuoteForm() {
   const [showQuotes, setShowQuotes] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedQuote, setSelectedQuote] = useState<QuoteResult | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [createdOrder, setCreatedOrder] = useState<{
+    id: string;
+    trackingNumber: string;
+    totalCost: number;
+    pickupAddress: string;
+    deliveryAddress: string;
+  } | null>(null);
 
   // Handle location changes
   const handleFromLocationChange = (location: CityLocation | null) => {
@@ -191,7 +200,7 @@ export default function ShippingQuoteForm() {
       // Simulate quote calculation based on package details and distance
       const volumetricWeight = getVolumetricWeight();
       const chargeableWeight = Math.max(formData.packageDetails.weight, volumetricWeight);
-      
+
       // Generate quotes for active courier partners
       const quoteResults: QuoteResult[] = courierPartners
         .filter(partner => partner.isActive)
@@ -200,10 +209,10 @@ export default function ShippingQuoteForm() {
           const basePrice = chargeableWeight * 50; // ₹50 per kg base rate
           const distanceMultiplier = Math.random() * 0.5 + 0.8; // 0.8-1.3x
           const partnerMultiplier = partner.rating / 5; // Rating-based pricing
-          
+
           const price = Math.round(basePrice * distanceMultiplier * partnerMultiplier);
           const estimatedDays = Math.ceil(Math.random() * 3) + 1; // 1-4 days
-          
+
           return {
             courierPartnerId: partner.id,
             courierName: partner.name,
@@ -274,9 +283,15 @@ export default function ShippingQuoteForm() {
       }
 
       const order = await response.json();
-      
-      // Redirect to order details page
-      router.push(`/orders/${order.id}`);
+
+      // Store the created order and show payment modal
+      setCreatedOrder({
+        ...order,
+        totalCost: quote.price,
+        pickupAddress: `${formData.fromLocation?.city}, ${formData.fromLocation?.state}`,
+        deliveryAddress: `${formData.toLocation?.city}, ${formData.toLocation?.state}`,
+      });
+      setShowPaymentModal(true);
     } catch (error) {
       console.error('Error creating order:', error);
       setErrors({ submit: 'Failed to create order. Please try again.' });
@@ -292,6 +307,15 @@ export default function ShippingQuoteForm() {
       return Math.round(((length * width * height) / 5000) * 100) / 100;
     }
     return 0;
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = (paymentId: string) => {
+    setShowPaymentModal(false);
+    // Redirect to order details page
+    if (createdOrder) {
+      router.push(`/orders/${createdOrder.id}?payment=${paymentId}`);
+    }
   };
 
   const volumetricWeight = getVolumetricWeight();
@@ -501,8 +525,8 @@ export default function ShippingQuoteForm() {
               <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Delivery Type *
               </label>
-              <Select 
-                value={formData.deliveryType} 
+              <Select
+                value={formData.deliveryType}
                 onValueChange={(value) => handleFieldChange('deliveryType', value)}
               >
                 <SelectTrigger className={errors.deliveryType ? 'border-red-500' : ''}>
@@ -532,9 +556,9 @@ export default function ShippingQuoteForm() {
             </div>
 
             {/* Submit Button */}
-            <Button 
-              type='submit' 
-              className='w-full' 
+            <Button
+              type='submit'
+              className='w-full'
               disabled={isLoadingQuotes}
             >
               {isLoadingQuotes ? (
@@ -560,13 +584,12 @@ export default function ShippingQuoteForm() {
           <CardContent>
             <div className="space-y-4">
               {quotes.map((quote, index) => (
-                <div 
+                <div
                   key={quote.courierPartnerId}
-                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                    selectedQuote?.courierPartnerId === quote.courierPartnerId
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`border rounded-lg p-4 cursor-pointer transition-all ${selectedQuote?.courierPartnerId === quote.courierPartnerId
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
                   onClick={() => setSelectedQuote(quote)}
                 >
                   <div className="flex items-center justify-between">
@@ -605,7 +628,7 @@ export default function ShippingQuoteForm() {
 
               {selectedQuote && (
                 <div className="pt-4 border-t">
-                  <Button 
+                  <Button
                     onClick={() => createOrder(selectedQuote)}
                     className="w-full"
                     disabled={isCreatingOrder}
@@ -622,6 +645,16 @@ export default function ShippingQuoteForm() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && createdOrder && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          order={createdOrder}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
       )}
     </div>
   );
