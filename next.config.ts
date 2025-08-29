@@ -6,13 +6,13 @@ const nextConfig: NextConfig = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-build',
     NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
   },
-  
+
   // Build configuration
   typescript: {
     // Allow build to continue even with type errors during development
     ignoreBuildErrors: false,
   },
-  
+
   eslint: {
     // Allow build to continue even with ESLint errors during development
     ignoreDuringBuilds: false,
