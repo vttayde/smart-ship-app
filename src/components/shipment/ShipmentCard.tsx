@@ -45,6 +45,7 @@ export function ShipmentCard({
             <CardTitle className='text-lg font-semibold'>{trackingNumber}</CardTitle>
             <p className='text-sm text-gray-600 mt-1'>{courierPartner}</p>
           </div>
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Badge variant={statusInfo.color as any}>{statusInfo.label}</Badge>
         </div>
       </CardHeader>
