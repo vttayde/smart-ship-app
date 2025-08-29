@@ -1,6 +1,15 @@
-import { CourierService, CourierCredentials, ShipmentAddress, ShipmentDetails, RateQuote, ShipmentBooking, TrackingUpdate, CourierAPIError } from './types';
-import { DelhiveryService } from './delhivery';
 import { PrismaClient } from '@prisma/client';
+import { DelhiveryService } from './delhivery';
+import {
+  CourierAPIError,
+  CourierCredentials,
+  CourierService,
+  RateQuote,
+  ShipmentAddress,
+  ShipmentBooking,
+  ShipmentDetails,
+  TrackingUpdate,
+} from './types';
 
 export interface CourierManagerConfig {
   prisma: PrismaClient;
@@ -21,7 +30,7 @@ export class CourierManager {
   async initialize(): Promise<void> {
     try {
       const activeConfigs = await this.prisma.courierAPIConfig.findMany({
-        where: { isActive: true }
+        where: { isActive: true },
       });
 
       for (const config of activeConfigs) {
@@ -44,7 +53,7 @@ export class CourierManager {
         authToken: this.decryptValue(config.authToken),
         clientId: config.clientId,
         clientSecret: this.decryptValue(config.clientSecret),
-        baseUrl: config.apiUrl
+        baseUrl: config.apiUrl,
       };
 
       const isProduction = config.environment === 'production';
@@ -83,18 +92,17 @@ export class CourierManager {
     // Check delivery availability and get rates from all services
     for (const [courierCode, service] of this.services) {
       promises.push(
-        service.canDeliver(delivery.pincode)
-          .then(async (canDeliver) => {
-            if (canDeliver) {
-              try {
-                return await service.calculateRate(pickup, delivery, shipment);
-              } catch (error) {
-                console.error(`Error getting rates from ${courierCode}:`, error);
-                return [];
-              }
+        service.canDeliver(delivery.pincode).then(async canDeliver => {
+          if (canDeliver) {
+            try {
+              return await service.calculateRate(pickup, delivery, shipment);
+            } catch (error) {
+              console.error(`Error getting rates from ${courierCode}:`, error);
+              return [];
             }
-            return [];
-          })
+          }
+          return [];
+        })
       );
     }
 
@@ -121,7 +129,7 @@ export class CourierManager {
 
     try {
       const booking = await service.bookShipment(pickup, delivery, shipment, serviceType, orderId);
-      
+
       // Update order in database with courier details
       await this.prisma.order.update({
         where: { id: orderId },
@@ -132,8 +140,8 @@ export class CourierManager {
           courierResponse: booking.rawResponse,
           bookedAt: new Date(),
           estimatedDelivery: booking.estimatedDelivery,
-          status: 'confirmed'
-        }
+          status: 'confirmed',
+        },
       });
 
       return booking;
@@ -174,7 +182,7 @@ export class CourierManager {
     try {
       const order = await this.prisma.order.findUnique({
         where: { id: orderId },
-        include: { courierPartner: true }
+        include: { courierPartner: true },
       });
 
       if (!order || !order.courierTrackingId) {
@@ -194,8 +202,8 @@ export class CourierManager {
             status: latestUpdate.status,
             courierStatus: latestUpdate.courierStatus,
             estimatedDelivery: latestUpdate.expectedDelivery || order.estimatedDelivery,
-            deliveredAt: latestUpdate.status === 'delivered' ? latestUpdate.timestamp : null
-          }
+            deliveredAt: latestUpdate.status === 'delivered' ? latestUpdate.timestamp : null,
+          },
         });
 
         // Insert new tracking updates
@@ -204,8 +212,8 @@ export class CourierManager {
             where: {
               orderId_timestamp: {
                 orderId: orderId,
-                timestamp: update.timestamp
-              }
+                timestamp: update.timestamp,
+              },
             },
             create: {
               orderId: orderId,
@@ -217,7 +225,7 @@ export class CourierManager {
               courierLocation: update.location,
               courierData: update.rawData,
               description: update.description,
-              expectedDelivery: update.expectedDelivery
+              expectedDelivery: update.expectedDelivery,
             },
             update: {
               status: update.status,
@@ -227,8 +235,8 @@ export class CourierManager {
               courierLocation: update.location,
               courierData: update.rawData,
               description: update.description,
-              expectedDelivery: update.expectedDelivery
-            }
+              expectedDelivery: update.expectedDelivery,
+            },
           });
         }
       }
@@ -242,7 +250,7 @@ export class CourierManager {
     try {
       const order = await this.prisma.order.findUnique({
         where: { id: orderId },
-        include: { courierPartner: true }
+        include: { courierPartner: true },
       });
 
       if (!order || !order.courierOrderId) {
@@ -261,8 +269,8 @@ export class CourierManager {
           where: { id: orderId },
           data: {
             status: 'cancelled',
-            courierStatus: 'cancelled'
-          }
+            courierStatus: 'cancelled',
+          },
         });
       }
 
@@ -278,7 +286,7 @@ export class CourierManager {
     try {
       const order = await this.prisma.order.findUnique({
         where: { id: orderId },
-        include: { courierPartner: true }
+        include: { courierPartner: true },
       });
 
       if (!order || !order.courierOrderId) {
@@ -302,7 +310,7 @@ export class CourierManager {
     try {
       const order = await this.prisma.order.findUnique({
         where: { id: orderId },
-        include: { courierPartner: true }
+        include: { courierPartner: true },
       });
 
       if (!order || !order.courierOrderId) {
@@ -321,8 +329,8 @@ export class CourierManager {
           where: { id: orderId },
           data: {
             status: 'pickup_scheduled',
-            dispatchedAt: pickupDate
-          }
+            dispatchedAt: pickupDate,
+          },
         });
       }
 

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { CourierManager } from '@/services/courier/manager';
+import { PrismaClient } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 let courierManager: CourierManager | null = null;
@@ -73,17 +73,11 @@ export async function POST(request: NextRequest) {
 
     // Validate weight and dimensions
     if (body.shipment.weight <= 0 || body.shipment.weight > 50) {
-      return NextResponse.json(
-        { error: 'Weight must be between 0.1 and 50 kg' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Weight must be between 0.1 and 50 kg' }, { status: 400 });
     }
 
     if (body.shipment.declaredValue <= 0) {
-      return NextResponse.json(
-        { error: 'Declared value must be greater than 0' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Declared value must be greater than 0' }, { status: 400 });
     }
 
     // Get courier manager
@@ -99,23 +93,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Get real-time quotes from all available courier services
-    const quotes = await manager.getAllRates(
-      body.pickup,
-      body.delivery,
-      body.shipment
-    );
+    const quotes = await manager.getAllRates(body.pickup, body.delivery, body.shipment);
 
     // Filter by preferred services if specified
-    const filteredQuotes = body.preferredServices 
+    const filteredQuotes = body.preferredServices
       ? quotes.filter(quote => body.preferredServices!.includes(quote.courierCode))
       : quotes;
 
     if (filteredQuotes.length === 0) {
       return NextResponse.json(
-        { 
+        {
           error: 'No quotes available for the specified route',
           availableServices,
-          message: 'This might be due to service unavailability in the delivery area or temporary API issues'
+          message:
+            'This might be due to service unavailability in the delivery area or temporary API issues',
         },
         { status: 404 }
       );
@@ -130,7 +121,7 @@ export async function POST(request: NextRequest) {
       courierRating: 4.2, // This would come from database in real implementation
       trackingAvailable: true,
       insuranceIncluded: quote.serviceType.features.includes('Insurance'),
-      codAvailable: quote.serviceType.features.includes('COD')
+      codAvailable: quote.serviceType.features.includes('COD'),
     }));
 
     // Add quote metadata
@@ -146,16 +137,15 @@ export async function POST(request: NextRequest) {
         route: {
           from: `${body.pickup.city}, ${body.pickup.state} - ${body.pickup.pincode}`,
           to: `${body.delivery.city}, ${body.delivery.state} - ${body.delivery.pincode}`,
-          distance: 'N/A' // Could be calculated using maps API
-        }
-      }
+          distance: 'N/A', // Could be calculated using maps API
+        },
+      },
     };
 
     return NextResponse.json(response);
-
   } catch (error) {
     console.error('Error getting quotes:', error);
-    
+
     // Check if it's a courier service specific error
     if (error instanceof Error && error.message.includes('Rate limit')) {
       return NextResponse.json(
@@ -165,9 +155,14 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to get shipping quotes',
-        message: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : 'Unknown error' : 'Internal server error'
+        message:
+          process.env.NODE_ENV === 'development'
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Internal server error',
       },
       { status: 500 }
     );
@@ -181,10 +176,7 @@ export async function GET(request: NextRequest) {
     const pincode = searchParams.get('pincode');
 
     if (!pincode) {
-      return NextResponse.json(
-        { error: 'Pincode parameter is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Pincode parameter is required' }, { status: 400 });
     }
 
     if (!/^\d{6}$/.test(pincode)) {
@@ -200,7 +192,7 @@ export async function GET(request: NextRequest) {
 
     // Check delivery availability for each service
     const serviceAvailability: { [key: string]: boolean } = {};
-    
+
     for (const serviceCode of availableServices) {
       const service = manager.getService(serviceCode);
       if (service) {
@@ -222,15 +214,11 @@ export async function GET(request: NextRequest) {
       summary: {
         totalServices: availableServices.length,
         availableServices: availableCount,
-        deliveryAvailable: availableCount > 0
-      }
+        deliveryAvailable: availableCount > 0,
+      },
     });
-
   } catch (error) {
     console.error('Error checking service availability:', error);
-    return NextResponse.json(
-      { error: 'Failed to check service availability' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to check service availability' }, { status: 500 });
   }
 }

@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { CourierManager } from '@/services/courier/manager';
-import { auth } from '@/lib/auth'; // Assuming auth middleware exists
+import { PrismaClient } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 let courierManager: CourierManager | null = null;
@@ -64,46 +63,37 @@ export async function POST(request: NextRequest) {
   try {
     // Get user from auth (implement based on your auth system)
     const userId = request.headers.get('x-user-id') || 'user-1'; // Temporary for development
-    
+
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const body: BookingRequest = await request.json();
 
     // Validate request data
-    if (!body.courierCode || !body.serviceType || !body.pickup || !body.delivery || !body.shipment) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    if (
+      !body.courierCode ||
+      !body.serviceType ||
+      !body.pickup ||
+      !body.delivery ||
+      !body.shipment
+    ) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Validate pincodes
     const pincodeRegex = /^\d{6}$/;
     if (!pincodeRegex.test(body.pickup.pincode) || !pincodeRegex.test(body.delivery.pincode)) {
-      return NextResponse.json(
-        { error: 'Invalid pincode format' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid pincode format' }, { status: 400 });
     }
 
     // Validate weight and value
     if (body.shipment.weight <= 0 || body.shipment.weight > 50) {
-      return NextResponse.json(
-        { error: 'Weight must be between 0.1 and 50 kg' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Weight must be between 0.1 and 50 kg' }, { status: 400 });
     }
 
     if (body.shipment.declaredValue <= 0) {
-      return NextResponse.json(
-        { error: 'Declared value must be greater than 0' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Declared value must be greater than 0' }, { status: 400 });
     }
 
     // Get courier manager
@@ -120,10 +110,7 @@ export async function POST(request: NextRequest) {
     // Check delivery availability
     const service = manager.getService(body.courierCode);
     if (!service) {
-      return NextResponse.json(
-        { error: 'Courier service not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Courier service not found' }, { status: 404 });
     }
 
     const canDeliver = await service.canDeliver(body.delivery.pincode);
@@ -151,8 +138,8 @@ export async function POST(request: NextRequest) {
           state: body.pickup.state,
           pincode: body.pickup.pincode,
           country: 'India',
-          type: 'pickup'
-        }
+          type: 'pickup',
+        },
       });
       pickupAddressId = pickupAddress.id;
     }
@@ -170,30 +157,29 @@ export async function POST(request: NextRequest) {
           state: body.delivery.state,
           pincode: body.delivery.pincode,
           country: 'India',
-          type: 'delivery'
-        }
+          type: 'delivery',
+        },
       });
       deliveryAddressId = deliveryAddress.id;
     }
 
     // Get courier partner info
     const courierPartner = await prisma.courierPartner.findFirst({
-      where: { code: body.courierCode }
+      where: { code: body.courierCode },
     });
 
     if (!courierPartner) {
-      return NextResponse.json(
-        { error: 'Courier partner not found in database' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Courier partner not found in database' }, { status: 404 });
     }
 
     // Calculate volumetric weight if dimensions provided
     let volumetricWeight = 0;
     if (body.shipment.dimensions) {
-      volumetricWeight = (body.shipment.dimensions.length * 
-                         body.shipment.dimensions.width * 
-                         body.shipment.dimensions.height) / 5000;
+      volumetricWeight =
+        (body.shipment.dimensions.length *
+          body.shipment.dimensions.width *
+          body.shipment.dimensions.height) /
+        5000;
     }
 
     const chargeableWeight = Math.max(body.shipment.weight, volumetricWeight);
@@ -234,8 +220,8 @@ export async function POST(request: NextRequest) {
         volumetricWeight: volumetricWeight,
         chargedWeight: chargeableWeight,
         serviceType: body.serviceType,
-        status: 'pending'
-      }
+        status: 'pending',
+      },
     });
 
     try {
@@ -274,8 +260,8 @@ export async function POST(request: NextRequest) {
           orderId: order.id,
           status: 'booked',
           message: `Order booked with ${body.courierCode}`,
-          createdBy: userId
-        }
+          createdBy: userId,
+        },
       });
 
       // Create initial tracking entry
@@ -286,8 +272,8 @@ export async function POST(request: NextRequest) {
           message: 'Order successfully booked with courier',
           courierStatus: 'BOOKED',
           description: `Shipment booked with ${quote.courierName}`,
-          timestamp: new Date()
-        }
+          timestamp: new Date(),
+        },
       });
 
       return NextResponse.json({
@@ -301,7 +287,7 @@ export async function POST(request: NextRequest) {
           courierName: quote.courierName,
           serviceType: quote.serviceType.name,
           labelUrl: booking.labelUrl,
-          manifestUrl: booking.manifestUrl
+          manifestUrl: booking.manifestUrl,
         },
         booking: {
           courierCode: body.courierCode,
@@ -310,39 +296,36 @@ export async function POST(request: NextRequest) {
           trackingId: booking.courierTrackingId,
           estimatedDelivery: booking.estimatedDelivery,
           transitTime: quote.transitTime,
-          features: quote.features
+          features: quote.features,
         },
         nextSteps: [
           'Your shipment has been booked successfully',
           'You will receive tracking updates via SMS and email',
           'Prepare your package for pickup',
           booking.labelUrl ? 'Print the shipping label and attach to package' : null,
-          body.schedulePickup ? `Pickup scheduled for ${body.schedulePickup.date}` : 'Schedule pickup when ready'
-        ].filter(Boolean)
+          body.schedulePickup
+            ? `Pickup scheduled for ${body.schedulePickup.date}`
+            : 'Schedule pickup when ready',
+        ].filter(Boolean),
       });
-
     } catch (bookingError) {
       // If courier booking fails, update order status to failed
       await prisma.order.update({
         where: { id: order.id },
-        data: { status: 'failed' }
+        data: { status: 'failed' },
       });
 
       console.error('Courier booking failed:', bookingError);
       throw bookingError;
     }
-
   } catch (error) {
     console.error('Error creating booking:', error);
-    
+
     if (error instanceof Error) {
       if (error.message.includes('Authentication')) {
-        return NextResponse.json(
-          { error: 'Courier authentication failed' },
-          { status: 502 }
-        );
+        return NextResponse.json({ error: 'Courier authentication failed' }, { status: 502 });
       }
-      
+
       if (error.message.includes('Rate limit')) {
         return NextResponse.json(
           { error: 'Service temporarily unavailable. Please try again later.' },
@@ -352,11 +335,14 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to create booking',
-        message: process.env.NODE_ENV === 'development' 
-          ? (error instanceof Error ? error.message : 'Unknown error')
-          : 'Internal server error'
+        message:
+          process.env.NODE_ENV === 'development'
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Internal server error',
       },
       { status: 500 }
     );
@@ -371,13 +357,10 @@ export async function GET(request: NextRequest) {
     const trackingId = searchParams.get('trackingId');
 
     if (!orderId && !trackingId) {
-      return NextResponse.json(
-        { error: 'Order ID or tracking ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Order ID or tracking ID is required' }, { status: 400 });
     }
 
-    let whereClause: any = {};
+    const whereClause: any = {};
     if (orderId) {
       whereClause.id = orderId;
     } else if (trackingId) {
@@ -392,20 +375,17 @@ export async function GET(request: NextRequest) {
         deliveryAddress: true,
         trackingUpdates: {
           orderBy: { timestamp: 'desc' },
-          take: 10
+          take: 10,
         },
         orderLogs: {
           orderBy: { timestamp: 'desc' },
-          take: 5
-        }
-      }
+          take: 5,
+        },
+      },
     });
 
     if (!order) {
-      return NextResponse.json(
-        { error: 'Order not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     // Get real-time tracking updates if courier tracking ID exists
@@ -414,7 +394,7 @@ export async function GET(request: NextRequest) {
       try {
         const manager = await getCourierManager();
         liveTracking = await manager.trackShipment(
-          order.courierTrackingId, 
+          order.courierTrackingId,
           order.courierPartner.code
         );
       } catch (error) {
@@ -439,23 +419,19 @@ export async function GET(request: NextRequest) {
         bookedAt: order.bookedAt,
         courier: {
           name: order.courierPartner.name,
-          code: order.courierPartner.code
+          code: order.courierPartner.code,
         },
         pickup: order.pickupAddress,
-        delivery: order.deliveryAddress
+        delivery: order.deliveryAddress,
       },
       tracking: {
         stored: order.trackingUpdates,
-        live: liveTracking
+        live: liveTracking,
       },
-      logs: order.orderLogs
+      logs: order.orderLogs,
     });
-
   } catch (error) {
     console.error('Error retrieving booking:', error);
-    return NextResponse.json(
-      { error: 'Failed to retrieve booking details' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to retrieve booking details' }, { status: 500 });
   }
 }

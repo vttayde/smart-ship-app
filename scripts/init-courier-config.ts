@@ -21,7 +21,7 @@ async function initializeCourierConfigurations() {
           services: ['express', 'surface', 'cod'],
           features: ['tracking', 'cod', 'insurance', 'returns'],
           maxWeight: 50,
-          maxDimensions: { length: 100, width: 100, height: 100 }
+          maxDimensions: { length: 100, width: 100, height: 100 },
         },
         serviceTypes: [
           {
@@ -29,25 +29,25 @@ async function initializeCourierConfigurations() {
             name: 'Express',
             description: 'Express delivery service',
             estimatedDays: 1,
-            isExpressDelivery: true
+            isExpressDelivery: true,
           },
           {
             code: 'S',
             name: 'Surface',
             description: 'Standard surface delivery',
             estimatedDays: 3,
-            isExpressDelivery: false
+            isExpressDelivery: false,
           },
           {
             code: 'C',
             name: 'Cash on Delivery',
             description: 'COD service',
             estimatedDays: 2,
-            isExpressDelivery: false
-          }
+            isExpressDelivery: false,
+          },
         ],
-        rateLimit: 100
-      }
+        rateLimit: 100,
+      },
     });
 
     // Create Shiprocket configuration (placeholder)
@@ -65,7 +65,7 @@ async function initializeCourierConfigurations() {
           services: ['standard', 'express', 'international'],
           features: ['tracking', 'cod', 'insurance', 'returns', 'scheduling'],
           maxWeight: 30,
-          maxDimensions: { length: 100, width: 100, height: 100 }
+          maxDimensions: { length: 100, width: 100, height: 100 },
         },
         serviceTypes: [
           {
@@ -73,18 +73,18 @@ async function initializeCourierConfigurations() {
             name: 'Standard',
             description: 'Standard delivery service',
             estimatedDays: 3,
-            isExpressDelivery: false
+            isExpressDelivery: false,
           },
           {
             code: 'express',
             name: 'Express',
             description: 'Express delivery service',
             estimatedDays: 1,
-            isExpressDelivery: true
-          }
+            isExpressDelivery: true,
+          },
         ],
-        rateLimit: 200
-      }
+        rateLimit: 200,
+      },
     });
 
     // Create Blue Dart configuration (placeholder)
@@ -102,7 +102,7 @@ async function initializeCourierConfigurations() {
           services: ['express', 'priority', 'ground'],
           features: ['tracking', 'cod', 'insurance', 'priority'],
           maxWeight: 25,
-          maxDimensions: { length: 100, width: 100, height: 100 }
+          maxDimensions: { length: 100, width: 100, height: 100 },
         },
         serviceTypes: [
           {
@@ -110,18 +110,18 @@ async function initializeCourierConfigurations() {
             name: 'Blue Dart Express',
             description: 'Premium express delivery',
             estimatedDays: 1,
-            isExpressDelivery: true
+            isExpressDelivery: true,
           },
           {
             code: 'ground',
             name: 'Ground Service',
             description: 'Ground delivery service',
             estimatedDays: 2,
-            isExpressDelivery: false
-          }
+            isExpressDelivery: false,
+          },
         ],
-        rateLimit: 150
-      }
+        rateLimit: 150,
+      },
     });
 
     // Create Ecom Express configuration (placeholder)
@@ -139,7 +139,7 @@ async function initializeCourierConfigurations() {
           services: ['standard', 'premium', 'cod'],
           features: ['tracking', 'cod', 'returns', 'bulk'],
           maxWeight: 30,
-          maxDimensions: { length: 100, width: 100, height: 100 }
+          maxDimensions: { length: 100, width: 100, height: 100 },
         },
         serviceTypes: [
           {
@@ -147,58 +147,58 @@ async function initializeCourierConfigurations() {
             name: 'Standard',
             description: 'Standard delivery service',
             estimatedDays: 3,
-            isExpressDelivery: false
+            isExpressDelivery: false,
           },
           {
             code: 'premium',
             name: 'Premium',
             description: 'Premium delivery service',
             estimatedDays: 2,
-            isExpressDelivery: true
-          }
+            isExpressDelivery: true,
+          },
         ],
-        rateLimit: 100
-      }
+        rateLimit: 100,
+      },
     });
 
     // Update existing courier partners with codes
     await prisma.courierPartner.updateMany({
       where: { name: 'Delhivery' },
-      data: { 
+      data: {
         code: 'delhivery',
         apiEndpoint: 'https://staging-express.delhivery.com',
         capabilities: {
           maxWeight: 50,
           serviceTypes: ['express', 'surface', 'cod'],
-          features: ['tracking', 'insurance', 'cod']
-        }
-      }
+          features: ['tracking', 'insurance', 'cod'],
+        },
+      },
     });
 
     await prisma.courierPartner.updateMany({
       where: { name: 'Blue Dart' },
-      data: { 
+      data: {
         code: 'blue_dart',
         apiEndpoint: 'https://api.bluedart.com',
         capabilities: {
           maxWeight: 25,
           serviceTypes: ['express', 'priority'],
-          features: ['tracking', 'insurance', 'priority']
-        }
-      }
+          features: ['tracking', 'insurance', 'priority'],
+        },
+      },
     });
 
     await prisma.courierPartner.updateMany({
       where: { name: 'FedEx' },
-      data: { 
+      data: {
         code: 'fedex',
         apiEndpoint: 'https://api.fedex.com',
         capabilities: {
           maxWeight: 30,
           serviceTypes: ['express', 'international'],
-          features: ['tracking', 'insurance', 'international']
-        }
-      }
+          features: ['tracking', 'insurance', 'international'],
+        },
+      },
     });
 
     console.log('✅ Courier API configurations initialized successfully!');
@@ -207,13 +207,12 @@ async function initializeCourierConfigurations() {
     console.log(`   - Shiprocket (Active: ${shiprocketConfig.isActive})`);
     console.log(`   - Blue Dart (Active: ${blueDartConfig.isActive})`);
     console.log(`   - Ecom Express (Active: ${ecomExpressConfig.isActive})`);
-    
+
     console.log(`\n📝 Next steps:`);
     console.log(`   1. Update API keys in the courier configurations`);
     console.log(`   2. Set environment to 'production' when ready`);
     console.log(`   3. Enable additional courier services by setting isActive: true`);
     console.log(`   4. Test with sandbox environments first`);
-
   } catch (error) {
     console.error('❌ Error initializing courier configurations:', error);
     throw error;
@@ -229,7 +228,7 @@ if (require.main === module) {
       console.log('🎉 Initialization completed successfully!');
       process.exit(0);
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('💥 Initialization failed:', error);
       process.exit(1);
     });

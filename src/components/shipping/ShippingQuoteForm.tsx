@@ -324,20 +324,18 @@ export default function ShippingQuoteForm() {
   if (!isAuthenticated) {
     return (
       <Card className='w-full max-w-4xl mx-auto'>
-        <CardContent className="p-12 text-center">
-          <User className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Login Required</h3>
-          <p className="text-gray-600 mb-6">Please log in to create shipments and get quotes.</p>
-          <Button onClick={() => router.push('/auth/login')}>
-            Sign In
-          </Button>
+        <CardContent className='p-12 text-center'>
+          <User className='w-16 h-16 mx-auto mb-4 text-gray-300' />
+          <h3 className='text-lg font-medium text-gray-900 mb-2'>Login Required</h3>
+          <p className='text-gray-600 mb-6'>Please log in to create shipments and get quotes.</p>
+          <Button onClick={() => router.push('/auth/login')}>Sign In</Button>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       <Card className='w-full max-w-4xl mx-auto'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
@@ -346,16 +344,22 @@ export default function ShippingQuoteForm() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => { e.preventDefault(); calculateQuotes(); }} className='space-y-6'>
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              calculateQuotes();
+            }}
+            className='space-y-6'
+          >
             {/* Error Messages */}
             {errors.auth && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-red-600">{errors.auth}</p>
+              <div className='bg-red-50 border border-red-200 rounded-md p-4'>
+                <p className='text-red-600'>{errors.auth}</p>
               </div>
             )}
             {errors.submit && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-red-600">{errors.submit}</p>
+              <div className='bg-red-50 border border-red-200 rounded-md p-4'>
+                <p className='text-red-600'>{errors.submit}</p>
               </div>
             )}
 
@@ -384,7 +388,9 @@ export default function ShippingQuoteForm() {
                   required
                   className={errors.toLocation ? 'border-red-500' : ''}
                 />
-                {errors.toLocation && <p className='text-sm text-red-600 mt-1'>{errors.toLocation}</p>}
+                {errors.toLocation && (
+                  <p className='text-sm text-red-600 mt-1'>{errors.toLocation}</p>
+                )}
               </div>
             </div>
 
@@ -494,7 +500,9 @@ export default function ShippingQuoteForm() {
                     placeholder='Books, Electronics, Clothing...'
                     className={errors.contents ? 'border-red-500' : ''}
                   />
-                  {errors.contents && <p className='text-sm text-red-600 mt-1'>{errors.contents}</p>}
+                  {errors.contents && (
+                    <p className='text-sm text-red-600 mt-1'>{errors.contents}</p>
+                  )}
                 </div>
               </div>
 
@@ -527,7 +535,7 @@ export default function ShippingQuoteForm() {
               </label>
               <Select
                 value={formData.deliveryType}
-                onValueChange={(value) => handleFieldChange('deliveryType', value)}
+                onValueChange={value => handleFieldChange('deliveryType', value)}
               >
                 <SelectTrigger className={errors.deliveryType ? 'border-red-500' : ''}>
                   <SelectValue placeholder='Select delivery type' />
@@ -539,7 +547,9 @@ export default function ShippingQuoteForm() {
                   <SelectItem value='same-day'>Same Day Delivery</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.deliveryType && <p className='text-sm text-red-600 mt-1'>{errors.deliveryType}</p>}
+              {errors.deliveryType && (
+                <p className='text-sm text-red-600 mt-1'>{errors.deliveryType}</p>
+              )}
             </div>
 
             {/* Delivery Instructions */}
@@ -556,13 +566,9 @@ export default function ShippingQuoteForm() {
             </div>
 
             {/* Submit Button */}
-            <Button
-              type='submit'
-              className='w-full'
-              disabled={isLoadingQuotes}
-            >
+            <Button type='submit' className='w-full' disabled={isLoadingQuotes}>
               {isLoadingQuotes ? (
-                <Loading className="w-4 h-4 mr-2" />
+                <Loading className='w-4 h-4 mr-2' />
               ) : (
                 <Calculator className='w-4 h-4 mr-2' />
               )}
@@ -582,63 +588,66 @@ export default function ShippingQuoteForm() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className='space-y-4'>
               {quotes.map((quote, index) => (
                 <div
                   key={quote.courierPartnerId}
-                  className={`border rounded-lg p-4 cursor-pointer transition-all ${selectedQuote?.courierPartnerId === quote.courierPartnerId
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                    selectedQuote?.courierPartnerId === quote.courierPartnerId
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
                   onClick={() => setSelectedQuote(quote)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold text-lg">{quote.courierName}</h4>
+                  <div className='flex items-center justify-between'>
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-2 mb-2'>
+                        <h4 className='font-semibold text-lg'>{quote.courierName}</h4>
                         {index === 0 && (
-                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                          <span className='bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full'>
                             Best Price
                           </span>
                         )}
-                        <div className="flex items-center gap-1">
-                          <span className="text-yellow-500">★</span>
-                          <span className="text-sm text-gray-600">{quote.rating.toFixed(1)}</span>
+                        <div className='flex items-center gap-1'>
+                          <span className='text-yellow-500'>★</span>
+                          <span className='text-sm text-gray-600'>{quote.rating.toFixed(1)}</span>
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                      <div className='grid grid-cols-3 gap-4 text-sm text-gray-600'>
                         <div>
-                          <span className="font-medium">Service:</span> {quote.serviceType}
+                          <span className='font-medium'>Service:</span> {quote.serviceType}
                         </div>
                         <div>
-                          <span className="font-medium">Delivery:</span> {quote.estimatedDays} days
+                          <span className='font-medium'>Delivery:</span> {quote.estimatedDays} days
                         </div>
                         <div>
-                          <span className="font-medium">Weight:</span> {chargeableWeight} kg
+                          <span className='font-medium'>Weight:</span> {chargeableWeight} kg
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-blue-600">₹{quote.price}</div>
-                      <div className="text-sm text-gray-500">+ taxes</div>
+                    <div className='text-right'>
+                      <div className='text-2xl font-bold text-blue-600'>₹{quote.price}</div>
+                      <div className='text-sm text-gray-500'>+ taxes</div>
                     </div>
                   </div>
                 </div>
               ))}
 
               {selectedQuote && (
-                <div className="pt-4 border-t">
+                <div className='pt-4 border-t'>
                   <Button
                     onClick={() => createOrder(selectedQuote)}
-                    className="w-full"
+                    className='w-full'
                     disabled={isCreatingOrder}
                   >
                     {isCreatingOrder ? (
-                      <Loading className="w-4 h-4 mr-2" />
+                      <Loading className='w-4 h-4 mr-2' />
                     ) : (
                       <ArrowRight className='w-4 h-4 mr-2' />
                     )}
-                    {isCreatingOrder ? 'Creating Order...' : `Book with ${selectedQuote.courierName} - ₹${selectedQuote.price}`}
+                    {isCreatingOrder
+                      ? 'Creating Order...'
+                      : `Book with ${selectedQuote.courierName} - ₹${selectedQuote.price}`}
                   </Button>
                 </div>
               )}

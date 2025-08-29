@@ -146,7 +146,11 @@ export abstract class CourierService implements CourierCapability {
     return /^\d{6}$/.test(pincode);
   }
 
-  protected calculateVolumetricWeight(dimensions: { length: number; width: number; height: number }): number {
+  protected calculateVolumetricWeight(dimensions: {
+    length: number;
+    width: number;
+    height: number;
+  }): number {
     // Standard volumetric weight calculation: (L × W × H) / 5000
     return (dimensions.length * dimensions.width * dimensions.height) / 5000;
   }
@@ -196,6 +200,7 @@ export class CourierServiceUnavailableError extends CourierAPIError {
 }
 
 export class CourierRateLimitError extends CourierAPIError {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(courierCode: string, retryAfter?: number) {
     super('Rate limit exceeded', courierCode);
     this.name = 'CourierRateLimitError';
