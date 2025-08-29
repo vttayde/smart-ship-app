@@ -64,10 +64,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          fail-on-severity: high
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Check for vulnerable dependencies
+        run: |
+          echo "Checking for high severity vulnerabilities..."
+          npm audit --audit-level=high --json > audit-results.json || true
+          
+          # Check if there are high severity vulnerabilities
+          high_vulns=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
+          critical_vulns=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
+          
+          echo "High severity vulnerabilities: $high_vulns"
+          echo "Critical severity vulnerabilities: $critical_vulns"
+          
+          if [ "$high_vulns" -gt 0 ] || [ "$critical_vulns" -gt 0 ]; then
+            echo "❌ Found high or critical severity vulnerabilities!"
+            npm audit --audit-level=high
+            exit 1
+          else
+            echo "✅ No high or critical severity vulnerabilities found"
+          fi
 
   license-check:
     name: License Check
