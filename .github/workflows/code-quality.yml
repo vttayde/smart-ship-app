@@ -76,7 +76,7 @@ jobs:
       - name: Run dependency security audit
         run: |
           echo "🔍 Running dependency security audit..."
-          
+
           # Run npm audit and capture exit code
           if npm audit --audit-level=moderate; then
             echo "✅ No moderate or higher vulnerabilities found"
