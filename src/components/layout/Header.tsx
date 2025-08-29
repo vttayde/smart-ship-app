@@ -44,16 +44,16 @@ export default function Header() {
   const publicNavigationItems: NavigationItem[] = [
     { name: 'Home', href: '/' },
     { name: 'Services', href: '/services' },
-    { name: 'Tracking', href: '/tracking' },
+    { name: 'Track Shipment', href: '/tracking/enhanced' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Contact', href: '/contact' },
   ];
 
   const dashboardNavigationItems: NavigationItem[] = [
-    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Ship Now', href: '/ship', icon: Plus },
+    { name: 'Dashboard', href: '/dashboard/enhanced', icon: BarChart3 },
+    { name: 'Ship Now', href: '/shipping/enhanced', icon: Plus },
     { name: 'My Orders', href: '/orders', icon: Package },
-    { name: 'Quotes', href: '/quotes', icon: Search },
+    { name: 'Track', href: '/tracking/enhanced', icon: Search },
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
