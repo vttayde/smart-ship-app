@@ -1,29 +1,28 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
-import { LucideIcon } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import {
-  User,
-  LogOut,
-  Package,
-  History,
-  Settings,
-  Menu,
-  X,
-  Truck,
   BarChart3,
-  CreditCard,
   Bell,
   ChevronDown,
-  Search,
+  History,
+  LogOut,
+  LucideIcon,
+  Menu,
+  Package,
   Plus,
+  Search,
+  Settings,
+  Truck,
+  User,
+  X,
 } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface NavigationItem {
   name: string;
@@ -52,16 +51,16 @@ export default function Header() {
 
   const dashboardNavigationItems: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Ship Now', href: '/dashboard/ship', icon: Plus },
-    { name: 'My Shipments', href: '/dashboard/shipments', icon: Package },
-    { name: 'Tracking', href: '/dashboard/tracking', icon: Search },
-    { name: 'History', href: '/dashboard/history', icon: History },
+    { name: 'Ship Now', href: '/ship', icon: Plus },
+    { name: 'My Orders', href: '/orders', icon: Package },
+    { name: 'Quotes', href: '/quotes', icon: Search },
+    { name: 'Profile', href: '/profile', icon: User },
   ];
 
   const userMenuItems: NavigationItem[] = [
-    { name: 'Profile', href: '/dashboard/profile', icon: User },
-    { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+    { name: 'My Profile', href: '/profile', icon: User },
+    { name: 'Order History', href: '/orders', icon: History },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
   const isDashboard = pathname?.startsWith('/dashboard');

@@ -12,6 +12,7 @@ build/
 
 # Generated files
 next-env.d.ts
+eslint-report.json
 
 # Database
 *.db

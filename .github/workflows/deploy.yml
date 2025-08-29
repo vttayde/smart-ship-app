@@ -5,6 +5,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  deployments: write
+
 env:
   NODE_VERSION: '18'
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

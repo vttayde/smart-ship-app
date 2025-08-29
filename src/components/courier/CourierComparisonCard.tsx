@@ -27,8 +27,9 @@ export function CourierComparisonCard({
 }: CourierComparisonCardProps) {
   return (
     <Card
-      className={`relative hover:shadow-lg transition-shadow ${isRecommended ? 'ring-2 ring-blue-500' : ''
-        }`}
+      className={`relative hover:shadow-lg transition-shadow ${
+        isRecommended ? 'ring-2 ring-blue-500' : ''
+      }`}
     >
       {isRecommended && (
         <div className='absolute -top-3 left-1/2 transform -translate-x-1/2'>

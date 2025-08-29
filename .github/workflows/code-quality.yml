@@ -64,10 +64,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          fail-on-severity: high
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run dependency security audit
+        run: |
+          echo "🔍 Running dependency security audit..."
+
+          # Run npm audit and capture exit code
+          if npm audit --audit-level=moderate; then
+            echo "✅ No moderate or higher vulnerabilities found"
+          else
+            echo "⚠️ Found vulnerabilities, checking severity..."
+            
+            # Run detailed audit for high/critical only
+            if npm audit --audit-level=high; then
+              echo "ℹ️ Only low/moderate vulnerabilities found - continuing"
+            else
+              echo "❌ High or critical vulnerabilities found!"
+              echo "Please run 'npm audit fix' to resolve security issues"
+              exit 1
+            fi
+          fi
 
   license-check:
     name: License Check

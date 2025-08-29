@@ -1,6 +1,8 @@
-# 📦 Ship Smart - Logistics Aggregation Platform
+# Smart Ship App
 
-A modern logistics platform that connects consumers with multiple courier service providers through a unified booking and tracking system.
+A modern shipping management application built with Next.js 15, TypeScript, and Tailwind CSS.
+
+> CI/CD pipeline configured with Vercel deployment ✅
 
 ## 🎯 Project Overview
 
