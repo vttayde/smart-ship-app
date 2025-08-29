@@ -23,7 +23,12 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "ci:lint": "npm run lint && npm run format:check && npm run type-check",
+    "ci:build": "npm run build",
+    "ci:security": "npm audit --audit-level=moderate",
+    "ci:full": "npm run ci:lint && npm run ci:security && npm run ci:build",
+    "pre-push": "npm run ci:full"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.10",

@@ -117,7 +117,7 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       // Ensure baseUrl has a fallback during build
       const fallbackBaseUrl = baseUrl || process.env.NEXTAUTH_URL || 'http://localhost:3000';
-      
+
       // Prevent redirect loops
       if (url === fallbackBaseUrl) return fallbackBaseUrl;
 
