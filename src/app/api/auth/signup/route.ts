@@ -67,6 +67,28 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Signup error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+
+    // Check for specific Prisma errors
+    if (error instanceof Error) {
+      if (error.message.includes('Unique constraint')) {
+        return NextResponse.json({ error: 'User already exists' }, { status: 409 });
+      }
+      if (error.message.includes('database')) {
+        return NextResponse.json({ error: 'Database connection error' }, { status: 503 });
+      }
+    }
+
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        details:
+          process.env.NODE_ENV === 'development'
+            ? error instanceof Error
+              ? error.message
+              : String(error)
+            : undefined,
+      },
+      { status: 500 }
+    );
   }
 }
