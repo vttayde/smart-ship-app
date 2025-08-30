@@ -11,9 +11,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
     }
 
+    // Check if webhook secret is available
+    if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook configuration not found' }, { status: 500 });
+    }
+
     // Verify webhook signature
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET!)
+      .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
       .update(body)
       .digest('hex');
 

@@ -14,6 +14,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if Razorpay secret is available
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+      return NextResponse.json({ error: 'Payment configuration not found' }, { status: 500 });
+    }
+
     // Find payment record
     const payment = await prisma.payment.findFirst({
       where: { gatewayRef: razorpay_order_id },
@@ -26,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Verify signature
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 
