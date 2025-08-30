@@ -10,8 +10,13 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  // Extend Next.js configurations
+  ...compat.extends('next/core-web-vitals'),
+  ...compat.extends('next/typescript'),
+
+  // Custom rules configuration
   {
+    files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
       // TypeScript specific rules
       '@typescript-eslint/no-unused-vars': [

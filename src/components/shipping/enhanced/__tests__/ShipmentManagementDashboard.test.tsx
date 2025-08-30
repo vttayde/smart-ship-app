@@ -1,5 +1,6 @@
 import dashboardReducer from '@/store/slices/dashboardSlice';
 import { configureStore } from '@reduxjs/toolkit';
+import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import ShipmentManagementDashboard from '../ShipmentManagementDashboard';

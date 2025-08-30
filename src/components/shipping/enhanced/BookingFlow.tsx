@@ -101,7 +101,7 @@ export default function EnhancedBookingFlow({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<
+  const [_paymentStatus, setPaymentStatus] = useState<
     'pending' | 'processing' | 'completed' | 'failed'
   >('pending');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -419,7 +419,7 @@ export default function EnhancedBookingFlow({
         <Loader2 className='w-16 h-16 animate-spin text-blue-600 mx-auto mb-4' />
         <h3 className='text-xl font-semibold mb-2'>Booking Your Shipment</h3>
         <p className='text-gray-600'>
-          We're processing your booking with {selectedQuote.courierName}...
+          We&apos;re processing your booking with {selectedQuote.courierName}...
         </p>
       </div>
       <div className='text-sm text-gray-500'>
@@ -484,16 +484,26 @@ export default function EnhancedBookingFlow({
                 <h4 className='font-semibold mb-3'>Downloads</h4>
                 <div className='flex gap-2'>
                   {bookingData.labelUrl && (
-                    <Button variant='outline' size='sm' asChild>
-                      <a href={bookingData.labelUrl} target='_blank' rel='noopener noreferrer'>
+                    <Button variant='outline' size='sm'>
+                      <a
+                        href={bookingData.labelUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        style={{ display: 'flex', alignItems: 'center' }}
+                      >
                         <Download className='w-4 h-4 mr-2' />
                         Shipping Label
                       </a>
                     </Button>
                   )}
                   {bookingData.manifestUrl && (
-                    <Button variant='outline' size='sm' asChild>
-                      <a href={bookingData.manifestUrl} target='_blank' rel='noopener noreferrer'>
+                    <Button variant='outline' size='sm'>
+                      <a
+                        href={bookingData.manifestUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        style={{ display: 'flex', alignItems: 'center' }}
+                      >
                         <Download className='w-4 h-4 mr-2' />
                         Manifest
                       </a>

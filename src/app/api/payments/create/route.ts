@@ -1,17 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 
-const prisma = new PrismaClient();
-
-// Initialize Razorpay instance
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
-
 export async function POST(request: NextRequest) {
   try {
+    // Initialize Razorpay instance inside the function
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      return NextResponse.json({ error: 'Razorpay configuration not found' }, { status: 500 });
+    }
+
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+
     const { orderId, amount, currency = 'INR', notes = {} } = await request.json();
 
     // Validate required fields
@@ -44,10 +46,11 @@ export async function POST(request: NextRequest) {
       data: {
         orderId,
         amount: amount * 100, // Store in paise
-        status: 'pending',
+        status: 'PENDING',
         gateway: 'razorpay',
         gatewayRef: razorpayOrder.id,
-      } as any,
+        currency: 'INR',
+      },
     });
 
     return NextResponse.json({

@@ -143,7 +143,7 @@ model CourierPartner {
   rating            Float    @default(0)
   
   // Service Capabilities
-  features          String[] // ["cod", "insurance", "priority", "bulk"]
+  features          Json?    // ["cod", "insurance", "priority", "bulk"] - stored as JSON array
   minWeight         Float?   // Minimum weight in kg
   maxWeight         Float?   // Maximum weight in kg
   avgDeliveryDays   Int      @default(3)

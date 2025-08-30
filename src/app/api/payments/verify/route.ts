@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,6 +12,11 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required payment verification parameters' },
         { status: 400 }
       );
+    }
+
+    // Check if Razorpay secret is available
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+      return NextResponse.json({ error: 'Payment configuration not found' }, { status: 500 });
     }
 
     // Find payment record
@@ -28,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Verify signature
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 
@@ -37,8 +40,8 @@ export async function POST(request: NextRequest) {
       await prisma.payment.update({
         where: { id: payment.id },
         data: {
-          status: 'failed',
-        } as any,
+          status: 'FAILED',
+        },
       });
 
       return NextResponse.json({ error: 'Invalid payment signature' }, { status: 400 });
@@ -48,8 +51,11 @@ export async function POST(request: NextRequest) {
     const updatedPayment = await prisma.payment.update({
       where: { id: payment.id },
       data: {
-        status: 'completed',
-      } as any,
+        status: 'CAPTURED',
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        paidAt: new Date(),
+      },
     });
 
     // Update order status to confirmed

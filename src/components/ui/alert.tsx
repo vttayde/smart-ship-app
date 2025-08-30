@@ -20,7 +20,7 @@ export function Alert({ className = '', variant = 'default', children, ...props 
   );
 }
 
-export interface AlertDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export type AlertDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 export function AlertDescription({ className = '', children, ...props }: AlertDescriptionProps) {
   return (

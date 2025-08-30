@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="64" fill="#2563eb"/>
+  
+  <!-- Ship/Container -->
+  <rect x="80" y="172" width="352" height="168" rx="16" fill="white"/>
+  
+  <!-- Container details -->
+  <rect x="104" y="196" width="64" height="120" rx="8" fill="#1d4ed8"/>
+  <rect x="184" y="196" width="64" height="120" rx="8" fill="#3b82f6"/>
+  <rect x="264" y="196" width="64" height="120" rx="8" fill="#1d4ed8"/>
+  <rect x="344" y="196" width="64" height="120" rx="8" fill="#3b82f6"/>
+  
+  <!-- Ship base -->
+  <path d="M64 340 L448 340 L432 384 L80 384 Z" fill="#1e40af"/>
+  
+  <!-- Waves -->
+  <path d="M32 400 Q48 384 64 400 Q80 416 96 400 Q112 384 128 400" stroke="white" stroke-width="8" fill="none" opacity="0.7"/>
+  <path d="M384 400 Q400 384 416 400 Q432 416 448 400 Q464 384 480 400" stroke="white" stroke-width="8" fill="none" opacity="0.7"/>
+  
+  <!-- Navigation/Signal icon -->
+  <circle cx="256" cy="104" r="12" fill="white"/>
+  <path d="M232 80 L256 56 L280 80" stroke="white" stroke-width="8" fill="none"/>
+  
+  <!-- Smart tech indicators -->
+  <circle cx="200" cy="120" r="4" fill="white" opacity="0.8"/>
+  <circle cx="220" cy="130" r="3" fill="white" opacity="0.6"/>
+  <circle cx="240" cy="120" r="4" fill="white" opacity="0.8"/>
+  <circle cx="272" cy="120" r="4" fill="white" opacity="0.8"/>
+  <circle cx="292" cy="130" r="3" fill="white" opacity="0.6"/>
+  <circle cx="312" cy="120" r="4" fill="white" opacity="0.8"/>
+</svg>

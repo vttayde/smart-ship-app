@@ -65,7 +65,7 @@ export interface ShipmentBooking {
   manifestUrl?: string;
   estimatedDelivery: Date;
   totalAmount: number;
-  rawResponse: any; // Full API response
+  rawResponse: unknown; // Full API response
 }
 
 export interface TrackingUpdate {
@@ -76,7 +76,7 @@ export interface TrackingUpdate {
   description: string;
   expectedDelivery?: Date;
   courierStatus: string;
-  rawData: any;
+  rawData: unknown;
 }
 
 export interface CourierCapability {
@@ -185,7 +185,7 @@ export class CourierAPIError extends Error {
     message: string,
     public courierCode: string,
     public statusCode?: number,
-    public rawResponse?: any
+    public rawResponse?: unknown
   ) {
     super(message);
     this.name = 'CourierAPIError';

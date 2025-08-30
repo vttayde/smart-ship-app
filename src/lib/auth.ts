@@ -147,18 +147,17 @@ export const authOptions: NextAuthOptions = {
   },
 
   events: {
-    async signIn({ user, account }) {
-      /* eslint-disable */
-      console.log('User signed in:', {
-        userId: user.id,
-        provider: account?.provider,
-      });
+    async signIn({ user: _user, account: _account }) {
+      // console.log('User signed in:', {
+      //   userId: user.id,
+      //   provider: account?.provider,
+      // });
     },
 
-    async signOut({ session, token }) {
-      console.log('User signed out:', {
-        userId: token?.id || session?.user?.id,
-      });
+    async signOut({ session: _session, token: _token }) {
+      // console.log('User signed out:', {
+      //   userId: token?.id || session?.user?.id,
+      // });
     },
   },
 

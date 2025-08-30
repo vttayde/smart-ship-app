@@ -14,21 +14,21 @@ const CRITICAL_RESOURCES = [
 ];
 
 // API endpoints to cache for offline access
-const API_CACHE_PATTERNS = ['/api/shipments', '/api/tracking', '/api/analytics'];
+const _API_CACHE_PATTERNS = ['/api/shipments', '/api/tracking', '/api/analytics'];
 
 // Install event - cache critical resources
 self.addEventListener('install', event => {
-  console.log('SmartShip Service Worker: Installing...');
+  console.warn('SmartShip Service Worker: Installing...');
 
   event.waitUntil(
     caches
       .open(CACHE_NAME)
       .then(cache => {
-        console.log('SmartShip Service Worker: Caching critical resources');
+        console.warn('SmartShip Service Worker: Caching critical resources');
         return cache.addAll(CRITICAL_RESOURCES);
       })
       .then(() => {
-        console.log('SmartShip Service Worker: Installation complete');
+        console.warn('SmartShip Service Worker: Installation complete');
         // Take control immediately
         return self.skipWaiting();
       })
@@ -37,7 +37,7 @@ self.addEventListener('install', event => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
-  console.log('SmartShip Service Worker: Activating...');
+  console.warn('SmartShip Service Worker: Activating...');
 
   event.waitUntil(
     caches
@@ -46,14 +46,14 @@ self.addEventListener('activate', event => {
         return Promise.all(
           cacheNames.map(cacheName => {
             if (cacheName !== CACHE_NAME) {
-              console.log('SmartShip Service Worker: Deleting old cache:', cacheName);
+              console.warn('SmartShip Service Worker: Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       })
       .then(() => {
-        console.log('SmartShip Service Worker: Activation complete');
+        console.warn('SmartShip Service Worker: Activation complete');
         // Take control of all pages immediately
         return self.clients.claim();
       })
@@ -109,8 +109,8 @@ async function handleNavigationRequest(request) {
     }
 
     return networkResponse;
-  } catch (error) {
-    console.log('SmartShip Service Worker: Network failed for navigation, checking cache...');
+  } catch {
+    console.warn('SmartShip Service Worker: Network failed for navigation, checking cache...');
 
     // Try cache
     const cachedResponse = await caches.match(request);
@@ -125,7 +125,7 @@ async function handleNavigationRequest(request) {
 
 // API request handler - Network First with Cache Fallback
 async function handleApiRequest(request) {
-  const url = new URL(request.url);
+  const _url = new URL(request.url);
 
   try {
     // Try network first
@@ -138,8 +138,8 @@ async function handleApiRequest(request) {
     }
 
     return networkResponse;
-  } catch (error) {
-    console.log('SmartShip Service Worker: Network failed for API, checking cache...');
+  } catch {
+    console.warn('SmartShip Service Worker: Network failed for API, checking cache...');
 
     // For read operations, try cache
     if (request.method === 'GET') {
@@ -189,8 +189,8 @@ async function handleStaticAssetRequest(request) {
     }
 
     return networkResponse;
-  } catch (error) {
-    console.log('SmartShip Service Worker: Failed to fetch static asset:', request.url);
+  } catch {
+    console.warn('SmartShip Service Worker: Failed to fetch static asset:', request.url);
 
     // Return a fallback for essential assets
     if (request.url.includes('.css')) {
@@ -213,7 +213,7 @@ async function handleStaticAssetRequest(request) {
 async function handleDefaultRequest(request) {
   try {
     return await fetch(request);
-  } catch (error) {
+  } catch {
     const cachedResponse = await caches.match(request);
     return cachedResponse || new Response('Offline', { status: 503 });
   }
@@ -221,7 +221,7 @@ async function handleDefaultRequest(request) {
 
 // Background sync for failed requests
 self.addEventListener('sync', event => {
-  console.log('SmartShip Service Worker: Background sync triggered:', event.tag);
+  console.warn('SmartShip Service Worker: Background sync triggered:', event.tag);
 
   if (event.tag === 'shipment-sync') {
     event.waitUntil(syncFailedShipments());
@@ -235,7 +235,7 @@ self.addEventListener('sync', event => {
 // Sync failed shipments when back online
 async function syncFailedShipments() {
   try {
-    console.log('SmartShip Service Worker: Syncing failed shipments...');
+    console.warn('SmartShip Service Worker: Syncing failed shipments...');
 
     // Get failed requests from IndexedDB or cache
     const failedRequests = await getFailedRequests('shipments');
@@ -244,7 +244,7 @@ async function syncFailedShipments() {
       try {
         await fetch(request.url, request.options);
         await removeFailedRequest('shipments', request.id);
-        console.log('SmartShip Service Worker: Synced shipment:', request.id);
+        console.warn('SmartShip Service Worker: Synced shipment:', request.id);
       } catch (error) {
         console.error('SmartShip Service Worker: Failed to sync shipment:', request.id, error);
       }
@@ -257,7 +257,7 @@ async function syncFailedShipments() {
 // Sync analytics data when back online
 async function syncAnalyticsData() {
   try {
-    console.log('SmartShip Service Worker: Syncing analytics data...');
+    console.warn('SmartShip Service Worker: Syncing analytics data...');
 
     // Implementation for analytics sync
     const analyticsData = await getStoredAnalytics();
@@ -270,7 +270,7 @@ async function syncAnalyticsData() {
       });
 
       await clearStoredAnalytics();
-      console.log('SmartShip Service Worker: Analytics data synced');
+      console.warn('SmartShip Service Worker: Analytics data synced');
     }
   } catch (error) {
     console.error('SmartShip Service Worker: Analytics sync failed:', error);
@@ -279,7 +279,7 @@ async function syncAnalyticsData() {
 
 // Push notification handler
 self.addEventListener('push', event => {
-  console.log('SmartShip Service Worker: Push notification received');
+  console.warn('SmartShip Service Worker: Push notification received');
 
   if (!event.data) {
     return;
@@ -314,7 +314,7 @@ self.addEventListener('push', event => {
 
 // Notification click handler
 self.addEventListener('notificationclick', event => {
-  console.log('SmartShip Service Worker: Notification clicked:', event.action);
+  console.warn('SmartShip Service Worker: Notification clicked:', event.action);
 
   event.notification.close();
 
@@ -326,7 +326,7 @@ self.addEventListener('notificationclick', event => {
 
 // Message handler for communication with main thread
 self.addEventListener('message', event => {
-  console.log('SmartShip Service Worker: Message received:', event.data);
+  console.warn('SmartShip Service Worker: Message received:', event.data);
 
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
@@ -346,12 +346,12 @@ self.addEventListener('message', event => {
 });
 
 // Helper functions for IndexedDB operations
-async function getFailedRequests(store) {
+async function getFailedRequests(_store) {
   // Implementation would use IndexedDB to store failed requests
   return [];
 }
 
-async function removeFailedRequest(store, id) {
+async function removeFailedRequest(_store, _id) {
   // Implementation would remove the request from IndexedDB
 }
 
@@ -364,4 +364,4 @@ async function clearStoredAnalytics() {
   // Implementation would clear stored analytics from IndexedDB
 }
 
-console.log('SmartShip Service Worker: Loaded successfully');
+console.warn('SmartShip Service Worker: Loaded successfully');

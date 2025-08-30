@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +11,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
     }
 
+    // Check if webhook secret is available
+    if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook configuration not found' }, { status: 500 });
+    }
+
     // Verify webhook signature
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET!)
+      .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
       .update(body)
       .digest('hex');
 
@@ -58,8 +61,10 @@ async function handlePaymentCaptured(payment: { order_id: string; id: string }) 
         gatewayRef: payment.order_id,
       },
       data: {
-        status: 'completed',
-      } as any,
+        status: 'CAPTURED',
+        razorpayPaymentId: payment.id,
+        paidAt: new Date(),
+      },
     });
 
     // Update order status
@@ -85,8 +90,9 @@ async function handlePaymentFailed(payment: { order_id: string; id: string }) {
         gatewayRef: payment.order_id,
       },
       data: {
-        status: 'failed',
-      } as any,
+        status: 'FAILED',
+        failureReason: 'Payment failed',
+      },
     });
   } catch (error) {
     console.error('Error handling payment failed:', error);
@@ -100,8 +106,9 @@ async function handleOrderPaid(order: { id: string }) {
         gatewayRef: order.id,
       },
       data: {
-        status: 'completed',
-      } as any,
+        status: 'CAPTURED',
+        paidAt: new Date(),
+      },
     });
   } catch (error) {
     console.error('Error handling order paid:', error);
