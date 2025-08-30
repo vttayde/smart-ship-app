@@ -1,9 +1,9 @@
+import { verifyPassword } from '@/lib/auth-utils';
+import { prisma } from '@/lib/prisma';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 // import GoogleProvider from "next-auth/providers/google"
 // import { PrismaAdapter } from "@next-auth/prisma-adapter"
-// import { prisma } from "@/lib/prisma"
-// import bcryptjs from "bcryptjs"
 
 // Note: NextAuth type extensions are handled automatically
 
@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
     //   },
     // }),
 
-    // Email/Password Provider with demo users
+    // Email/Password Provider with database authentication
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -38,38 +38,80 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Email and password are required');
         }
 
-        // Demo users for development
-        const demoUsers = [
-          {
-            id: '1',
-            email: 'demo@smartship.com',
-            password: 'demo123',
-            name: 'Demo User',
-            role: 'USER',
-          },
-          {
-            id: '2',
-            email: 'admin@smartship.com',
-            password: 'admin123',
-            name: 'Admin User',
-            role: 'ADMIN',
-          },
-        ];
+        try {
+          // Find user in database
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email.toLowerCase() },
+          });
 
-        const user = demoUsers.find(u => u.email === credentials.email.toLowerCase());
+          if (!user) {
+            throw new Error('Invalid email or password');
+          }
 
-        if (!user || user.password !== credentials.password) {
-          throw new Error('Invalid email or password');
+          // If user has no password hash, check demo users
+          if (!user.passwordHash) {
+            const demoUsers = [
+              {
+                id: '1',
+                email: 'demo@smartship.com',
+                password: 'demo123',
+                name: 'Demo User',
+                role: 'USER',
+              },
+              {
+                id: '2',
+                email: 'admin@smartship.com',
+                password: 'admin123',
+                name: 'Admin User',
+                role: 'ADMIN',
+              },
+            ];
+
+            const demoUser = demoUsers.find(u => u.email === credentials.email.toLowerCase());
+            if (!demoUser || demoUser.password !== credentials.password) {
+              throw new Error('Invalid email or password');
+            }
+
+            return {
+              id: user.id,
+              email: user.email,
+              name:
+                user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.name || demoUser.name,
+              image: user.image,
+              role: user.role,
+              emailVerified: user.emailVerified,
+            };
+          }
+
+          // Verify password for database users
+          const isValidPassword = await verifyPassword(credentials.password, user.passwordHash);
+          if (!isValidPassword) {
+            throw new Error('Invalid email or password');
+          }
+
+          // Update last login
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { lastLoginAt: new Date() },
+          });
+
+          return {
+            id: user.id,
+            email: user.email,
+            name:
+              user.firstName && user.lastName
+                ? `${user.firstName} ${user.lastName}`
+                : user.name || 'User',
+            image: user.image,
+            role: user.role,
+            emailVerified: user.emailVerified,
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
+          throw new Error('Authentication failed');
         }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: null,
-          role: user.role,
-          emailVerified: new Date(),
-        };
       },
     }),
   ],
