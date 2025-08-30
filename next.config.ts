@@ -4,7 +4,10 @@ const nextConfig: NextConfig = {
   // Environment variables configuration
   env: {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-build',
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+    // Use Vercel's automatic URL or fallback to environment variable
+    NEXTAUTH_URL: process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXTAUTH_URL || 'http://localhost:3000',
   },
 
   // Build configuration

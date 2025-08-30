@@ -2,7 +2,7 @@ import { hashPassword } from '@/lib/auth-utils';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
-export async function POST() {
+export async function GET() {
   try {
     // Check if this is the first run
     const userCount = await prisma.user.count();
@@ -56,4 +56,9 @@ export async function POST() {
       { status: 500 }
     );
   }
+}
+
+// Also support POST method for flexibility
+export async function POST() {
+  return GET();
 }
