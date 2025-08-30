@@ -7,6 +7,7 @@ Your app is deployed but failing because **PostgreSQL database is not configured
 ## 🗄️ Step 1: Create PostgreSQL Database
 
 ### Option A: Vercel Postgres (Recommended)
+
 1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
 2. Select your `smart-ship-app` project
 3. Go to **Storage** tab
@@ -15,12 +16,15 @@ Your app is deployed but failing because **PostgreSQL database is not configured
 6. Vercel will automatically add `DATABASE_URL` to your environment variables
 
 ### Option B: External Database (Alternative)
+
 **Neon (Free PostgreSQL):**
+
 1. Go to [neon.tech](https://neon.tech)
 2. Create free account and database
 3. Copy the connection string
 
 **Supabase (Free PostgreSQL):**
+
 1. Go to [supabase.com](https://supabase.com)
 2. Create project and get database URL
 
@@ -30,11 +34,11 @@ Go to **Vercel Dashboard** → **Your Project** → **Settings** → **Environme
 
 Add these **REQUIRED** variables:
 
-| Variable | Value | Example |
-|----------|-------|---------|
-| `DATABASE_URL` | Your PostgreSQL URL | `postgresql://user:pass@host:5432/db` |
+| Variable          | Value                  | Example                               |
+| ----------------- | ---------------------- | ------------------------------------- |
+| `DATABASE_URL`    | Your PostgreSQL URL    | `postgresql://user:pass@host:5432/db` |
 | `NEXTAUTH_SECRET` | Random 32+ char string | `your-super-secret-nextauth-key-here` |
-| `NEXTAUTH_URL` | Your Vercel app URL | `https://smart-ship-xxx.vercel.app` |
+| `NEXTAUTH_URL`    | Your Vercel app URL    | `https://smart-ship-xxx.vercel.app`   |
 
 **Optional but recommended:**
 | Variable | Value | Purpose |
@@ -45,6 +49,7 @@ Add these **REQUIRED** variables:
 ## 🔧 Step 3: Generate NEXTAUTH_SECRET
 
 Run this command to generate a secure secret:
+
 ```bash
 openssl rand -base64 32
 ```
@@ -64,11 +69,13 @@ Or use this online generator: https://generate-secret.vercel.app/32
 Once redeployed with proper environment variables:
 
 1. **Initialize Database:**
+
    ```
    https://your-app.vercel.app/api/init-db
    ```
 
 2. **Health Check:**
+
    ```
    https://your-app.vercel.app/api/health
    ```
@@ -82,6 +89,7 @@ Once redeployed with proper environment variables:
 ## 🚨 Current Error Analysis
 
 Your 500 errors are caused by:
+
 - ❌ Missing `DATABASE_URL` environment variable
 - ❌ Database connection failing in production
 - ❌ Prisma client cannot connect to database
@@ -104,6 +112,7 @@ Your 500 errors are caused by:
 ---
 
 ## ✅ Status Update
+
 - Database: ✅ Configured
 - Environment Variables: ✅ Set
 - Ready for deployment: ✅ Yes
