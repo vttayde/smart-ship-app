@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/lib/prisma';
 
 async function initializeCourierConfigurations() {
-  console.log('🚀 Initializing courier API configurations...');
+  console.warn('🚀 Initializing courier API configurations...');
 
   try {
     // Create Delhivery configuration
@@ -167,11 +165,8 @@ async function initializeCourierConfigurations() {
       data: {
         code: 'delhivery',
         apiEndpoint: 'https://staging-express.delhivery.com',
-        capabilities: {
-          maxWeight: 50,
-          serviceTypes: ['express', 'surface', 'cod'],
-          features: ['tracking', 'insurance', 'cod'],
-        },
+        maxWeight: 50,
+        features: ['tracking', 'insurance', 'cod'],
       },
     });
 
@@ -180,11 +175,8 @@ async function initializeCourierConfigurations() {
       data: {
         code: 'blue_dart',
         apiEndpoint: 'https://api.bluedart.com',
-        capabilities: {
-          maxWeight: 25,
-          serviceTypes: ['express', 'priority'],
-          features: ['tracking', 'insurance', 'priority'],
-        },
+        maxWeight: 25,
+        features: ['tracking', 'insurance', 'priority'],
       },
     });
 
@@ -193,26 +185,23 @@ async function initializeCourierConfigurations() {
       data: {
         code: 'fedex',
         apiEndpoint: 'https://api.fedex.com',
-        capabilities: {
-          maxWeight: 30,
-          serviceTypes: ['express', 'international'],
-          features: ['tracking', 'insurance', 'international'],
-        },
+        maxWeight: 30,
+        features: ['tracking', 'insurance', 'international'],
       },
     });
 
-    console.log('✅ Courier API configurations initialized successfully!');
-    console.log(`✅ Created/Updated configurations:`);
-    console.log(`   - Delhivery (Active: ${delhiveryConfig.isActive})`);
-    console.log(`   - Shiprocket (Active: ${shiprocketConfig.isActive})`);
-    console.log(`   - Blue Dart (Active: ${blueDartConfig.isActive})`);
-    console.log(`   - Ecom Express (Active: ${ecomExpressConfig.isActive})`);
+    console.warn('✅ Courier API configurations initialized successfully!');
+    console.warn(`✅ Created/Updated configurations:`);
+    console.warn(`   - Delhivery (Active: ${delhiveryConfig.isActive})`);
+    console.warn(`   - Shiprocket (Active: ${shiprocketConfig.isActive})`);
+    console.warn(`   - Blue Dart (Active: ${blueDartConfig.isActive})`);
+    console.warn(`   - Ecom Express (Active: ${ecomExpressConfig.isActive})`);
 
-    console.log(`\n📝 Next steps:`);
-    console.log(`   1. Update API keys in the courier configurations`);
-    console.log(`   2. Set environment to 'production' when ready`);
-    console.log(`   3. Enable additional courier services by setting isActive: true`);
-    console.log(`   4. Test with sandbox environments first`);
+    console.warn(`\n📝 Next steps:`);
+    console.warn(`   1. Update API keys in the courier configurations`);
+    console.warn(`   2. Set environment to 'production' when ready`);
+    console.warn(`   3. Enable additional courier services by setting isActive: true`);
+    console.warn(`   4. Test with sandbox environments first`);
   } catch (error) {
     console.error('❌ Error initializing courier configurations:', error);
     throw error;
@@ -225,7 +214,7 @@ async function initializeCourierConfigurations() {
 if (require.main === module) {
   initializeCourierConfigurations()
     .then(() => {
-      console.log('🎉 Initialization completed successfully!');
+      console.warn('🎉 Initialization completed successfully!');
       process.exit(0);
     })
     .catch(error => {

@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
     const courierPartner = await prisma.courierPartner.create({
       data: {
         name,
+        code: name.toLowerCase().replace(/[^a-z0-9]/g, '_'), // Generate code from name
         pricingModel: pricingModel || null,
         coverageAreas: coverageAreas || null,
         apiKey: apiKey || null,

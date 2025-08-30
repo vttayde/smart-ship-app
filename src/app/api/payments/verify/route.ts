@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,8 +35,8 @@ export async function POST(request: NextRequest) {
       await prisma.payment.update({
         where: { id: payment.id },
         data: {
-          status: 'failed',
-        } as any,
+          status: 'FAILED',
+        },
       });
 
       return NextResponse.json({ error: 'Invalid payment signature' }, { status: 400 });
@@ -48,8 +46,11 @@ export async function POST(request: NextRequest) {
     const updatedPayment = await prisma.payment.update({
       where: { id: payment.id },
       data: {
-        status: 'completed',
-      } as any,
+        status: 'CAPTURED',
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        paidAt: new Date(),
+      },
     });
 
     // Update order status to confirmed

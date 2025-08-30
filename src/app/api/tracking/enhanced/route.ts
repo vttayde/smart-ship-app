@@ -1,14 +1,13 @@
+import { prisma } from '@/lib/prisma';
 import { CourierManager } from '@/services/courier/manager';
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
 let courierManager: CourierManager | null = null;
 
 // Initialize courier manager
 async function getCourierManager(): Promise<CourierManager> {
   if (!courierManager) {
-    courierManager = new CourierManager({ prisma });
+    courierManager = new CourierManager();
     await courierManager.initialize();
   }
   return courierManager;
@@ -111,7 +110,8 @@ export async function GET(request: NextRequest) {
         origin: `${order.pickupAddress.city}, ${order.pickupAddress.state}`,
         destination: `${order.deliveryAddress.city}, ${order.deliveryAddress.state}`,
       },
-      timeline: order.trackingUpdates.map((update, index) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      timeline: order.trackingUpdates.map((update: any, index: number) => ({
         status: update.status,
         timestamp: update.timestamp,
         location: update.location || undefined,

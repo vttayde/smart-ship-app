@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/lib/prisma';
 
 async function main() {
   /* eslint-disable */
-  console.log('🌱 Seeding database...');
+  console.warn('🌱 Seeding database...');
 
   // Create courier partners
   const delhivery = await prisma.courierPartner.upsert({
@@ -12,6 +10,7 @@ async function main() {
     update: {},
     create: {
       name: 'Delhivery',
+      code: 'delhivery',
       pricingModel: {
         basePrice: 40,
         perKgRate: 20,
@@ -28,6 +27,7 @@ async function main() {
     update: {},
     create: {
       name: 'Shadowfax',
+      code: 'shadowfax',
       pricingModel: {
         basePrice: 50,
         perKgRate: 25,
@@ -45,6 +45,7 @@ async function main() {
     update: {},
     create: {
       name: 'Ekart',
+      code: 'ekart',
       pricingModel: {
         basePrice: 35,
         perKgRate: 18,

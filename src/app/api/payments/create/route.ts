@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
-
-const prisma = new PrismaClient();
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -44,10 +42,11 @@ export async function POST(request: NextRequest) {
       data: {
         orderId,
         amount: amount * 100, // Store in paise
-        status: 'pending',
+        status: 'PENDING',
         gateway: 'razorpay',
         gatewayRef: razorpayOrder.id,
-      } as any,
+        currency: 'INR',
+      },
     });
 
     return NextResponse.json({

@@ -657,12 +657,21 @@ export default function ShippingQuoteForm() {
       )}
 
       {/* Payment Modal */}
-      {showPaymentModal && createdOrder && (
+      {showPaymentModal && createdOrder && selectedQuote && (
         <PaymentModal
           isOpen={showPaymentModal}
           onClose={() => setShowPaymentModal(false)}
-          order={createdOrder}
-          onPaymentSuccess={handlePaymentSuccess}
+          amount={createdOrder.totalCost}
+          currency='INR'
+          orderDetails={{
+            courierName: selectedQuote.courierName,
+            serviceType: selectedQuote.serviceType,
+            weight: formData.packageDetails.weight,
+            route: `${formData.fromLocation?.city} → ${formData.toLocation?.city}`,
+          }}
+          onSuccess={async (paymentId: string, _orderId: string) => {
+            handlePaymentSuccess(paymentId);
+          }}
         />
       )}
     </div>

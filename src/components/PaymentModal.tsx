@@ -7,20 +7,46 @@ import { Card } from './ui/Card';
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  order: {
-    id: string;
-    trackingNumber: string;
-    totalCost: number;
-    pickupAddress: string;
-    deliveryAddress: string;
+  amount: number;
+  currency: string;
+  orderDetails: {
+    courierName: string;
+    serviceType: string;
+    weight: number;
+    route: string;
   };
-  onPaymentSuccess: (paymentId: string) => void;
+  onSuccess: (paymentId: string, orderId: string) => Promise<void>;
+}
+
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description?: string;
+  order_id: string;
+  handler: (response: {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+  }) => void;
+  prefill?: {
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
+  theme?: {
+    color?: string;
+  };
+  modal?: {
+    ondismiss?: () => void;
+  };
 }
 
 declare global {
   interface Window {
     Razorpay: {
-      new (options: any): {
+      new (options: RazorpayOptions): {
         open: () => void;
       };
     };
@@ -30,8 +56,10 @@ declare global {
 export default function PaymentModal({
   isOpen,
   onClose,
-  order,
-  onPaymentSuccess,
+  amount,
+  currency,
+  orderDetails,
+  onSuccess,
 }: PaymentModalProps) {
   const [loading, setLoading] = useState(false);
 
@@ -39,6 +67,9 @@ export default function PaymentModal({
     setLoading(true);
 
     try {
+      // Generate a temporary order ID for payment
+      const orderId = `order_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+
       // Create payment order
       const response = await fetch('/api/payments/create', {
         method: 'POST',
@@ -46,17 +77,20 @@ export default function PaymentModal({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          orderId: order.id,
-          amount: order.totalCost,
-          currency: 'INR',
+          orderId,
+          amount,
+          currency,
           notes: {
-            trackingNumber: order.trackingNumber,
+            courierName: orderDetails.courierName,
+            serviceType: orderDetails.serviceType,
+            weight: orderDetails.weight,
+            route: orderDetails.route,
             orderType: 'shipping',
           },
         }),
       });
 
-      const { payment, razorpayOrder } = await response.json();
+      const { razorpayOrder } = await response.json();
 
       if (!response.ok) {
         throw new Error('Failed to create payment');
@@ -68,7 +102,7 @@ export default function PaymentModal({
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         name: 'Smart Ship',
-        description: `Payment for Order ${order.trackingNumber}`,
+        description: `Payment for ${orderDetails.courierName} shipping via ${orderDetails.serviceType}`,
         order_id: razorpayOrder.id,
         handler: async function (response: {
           razorpay_order_id: string;
@@ -92,7 +126,7 @@ export default function PaymentModal({
             const verifyResult = await verifyResponse.json();
 
             if (verifyResult.success) {
-              onPaymentSuccess(payment.id);
+              await onSuccess(response.razorpay_payment_id, orderId);
               onClose();
             } else {
               alert('Payment verification failed');
@@ -108,8 +142,9 @@ export default function PaymentModal({
           contact: '9999999999',
         },
         notes: {
-          orderId: order.id,
-          trackingNumber: order.trackingNumber,
+          orderId,
+          courierName: orderDetails.courierName,
+          serviceType: orderDetails.serviceType,
         },
         theme: {
           color: '#3B82F6',
@@ -145,29 +180,27 @@ export default function PaymentModal({
         <div className='space-y-4 mb-6'>
           <div>
             <h3 className='font-medium text-gray-900'>Order Summary</h3>
-            <p className='text-sm text-gray-600'>Tracking: {order.trackingNumber}</p>
+            <p className='text-sm text-gray-600'>Courier: {orderDetails.courierName}</p>
+            <p className='text-sm text-gray-600'>Service: {orderDetails.serviceType}</p>
+            <p className='text-sm text-gray-600'>Weight: {orderDetails.weight}kg</p>
+            <p className='text-sm text-gray-600'>Route: {orderDetails.route}</p>
           </div>
 
           <div className='border-t pt-4'>
             <div className='flex justify-between'>
               <span className='text-gray-600'>Shipping Cost:</span>
-              <span className='font-medium'>₹{order.totalCost}</span>
+              <span className='font-medium'>₹{amount}</span>
             </div>
             <div className='flex justify-between text-lg font-semibold mt-2'>
               <span>Total Amount:</span>
-              <span>₹{order.totalCost}</span>
+              <span>₹{amount}</span>
             </div>
-          </div>
-
-          <div className='text-xs text-gray-500'>
-            <p>Pickup: {order.pickupAddress}</p>
-            <p>Delivery: {order.deliveryAddress}</p>
           </div>
         </div>
 
         <div className='space-y-3'>
           <Button onClick={handlePayment} disabled={loading} className='w-full'>
-            {loading ? 'Processing...' : `Pay ₹${order.totalCost}`}
+            {loading ? 'Processing...' : `Pay ₹${amount}`}
           </Button>
 
           <Button variant='outline' onClick={onClose} className='w-full'>

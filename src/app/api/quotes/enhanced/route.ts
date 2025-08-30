@@ -1,14 +1,12 @@
 import { CourierManager } from '@/services/courier/manager';
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
 let courierManager: CourierManager | null = null;
 
 // Initialize courier manager if not already done
 async function getCourierManager(): Promise<CourierManager> {
   if (!courierManager) {
-    courierManager = new CourierManager({ prisma });
+    courierManager = new CourierManager();
     await courierManager.initialize();
   }
   return courierManager;

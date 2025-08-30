@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { DelhiveryService } from './delhivery';
 import {
   CourierAPIError,
@@ -12,24 +12,21 @@ import {
 } from './types';
 
 export interface CourierManagerConfig {
-  prisma: PrismaClient;
   encryptionKey?: string; // For encrypting API credentials
 }
 
 export class CourierManager {
   private services: Map<string, CourierService> = new Map();
-  private prisma: PrismaClient;
   private encryptionKey: string;
 
-  constructor(config: CourierManagerConfig) {
-    this.prisma = config.prisma;
-    this.encryptionKey = config.encryptionKey || process.env.ENCRYPTION_KEY || 'default-key';
+  constructor(config?: CourierManagerConfig) {
+    this.encryptionKey = config?.encryptionKey || process.env.ENCRYPTION_KEY || 'default-key';
   }
 
   // Initialize all active courier services
   async initialize(): Promise<void> {
     try {
-      const activeConfigs = await this.prisma.courierAPIConfig.findMany({
+      const activeConfigs = await prisma.courierAPIConfig.findMany({
         where: { isActive: true },
       });
 
@@ -37,7 +34,7 @@ export class CourierManager {
         await this.initializeCourierService(config);
       }
 
-      console.log(`Initialized ${this.services.size} courier services`);
+      // console.log(`Initialized ${this.services.size} courier services`);
     } catch (error) {
       console.error('Error initializing courier services:', error);
       throw error;
@@ -45,6 +42,7 @@ export class CourierManager {
   }
 
   // Initialize a specific courier service
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async initializeCourierService(config: any): Promise<void> {
     try {
       const credentials: CourierCredentials = {
@@ -74,7 +72,7 @@ export class CourierManager {
       }
 
       this.services.set(config.courierCode, service);
-      console.log(`Initialized ${config.courierName} service`);
+      // console.log(`Initialized ${config.courierName} service`);
     } catch (error) {
       console.error(`Error initializing ${config.courierCode} service:`, error);
     }
@@ -131,13 +129,15 @@ export class CourierManager {
       const booking = await service.bookShipment(pickup, delivery, shipment, serviceType, orderId);
 
       // Update order in database with courier details
-      await this.prisma.order.update({
+      await prisma.order.update({
         where: { id: orderId },
         data: {
           courierOrderId: booking.courierOrderId,
           courierTrackingId: booking.courierTrackingId,
           courierStatus: 'booked',
-          courierResponse: booking.rawResponse,
+          courierResponse: booking.rawResponse
+            ? JSON.parse(JSON.stringify(booking.rawResponse))
+            : null,
           bookedAt: new Date(),
           estimatedDelivery: booking.estimatedDelivery,
           status: 'confirmed',
@@ -180,7 +180,7 @@ export class CourierManager {
   // Update tracking information in database
   async updateTrackingInfo(orderId: string): Promise<void> {
     try {
-      const order = await this.prisma.order.findUnique({
+      const order = await prisma.order.findUnique({
         where: { id: orderId },
         include: { courierPartner: true },
       });
@@ -196,7 +196,7 @@ export class CourierManager {
         const latestUpdate = updates[0];
 
         // Update order status
-        await this.prisma.order.update({
+        await prisma.order.update({
           where: { id: orderId },
           data: {
             status: latestUpdate.status,
@@ -208,7 +208,7 @@ export class CourierManager {
 
         // Insert new tracking updates
         for (const update of updates) {
-          await this.prisma.orderTracking.upsert({
+          await prisma.orderTracking.upsert({
             where: {
               orderId_timestamp: {
                 orderId: orderId,
@@ -223,7 +223,7 @@ export class CourierManager {
               timestamp: update.timestamp,
               courierStatus: update.courierStatus,
               courierLocation: update.location,
-              courierData: update.rawData,
+              courierData: update.rawData ? JSON.parse(JSON.stringify(update.rawData)) : null,
               description: update.description,
               expectedDelivery: update.expectedDelivery,
             },
@@ -233,7 +233,7 @@ export class CourierManager {
               message: update.description,
               courierStatus: update.courierStatus,
               courierLocation: update.location,
-              courierData: update.rawData,
+              courierData: update.rawData ? JSON.parse(JSON.stringify(update.rawData)) : null,
               description: update.description,
               expectedDelivery: update.expectedDelivery,
             },
@@ -248,7 +248,7 @@ export class CourierManager {
   // Cancel shipment with courier
   async cancelShipment(orderId: string): Promise<boolean> {
     try {
-      const order = await this.prisma.order.findUnique({
+      const order = await prisma.order.findUnique({
         where: { id: orderId },
         include: { courierPartner: true },
       });
@@ -265,7 +265,7 @@ export class CourierManager {
       const cancelled = await service.cancelShipment(order.courierOrderId);
 
       if (cancelled) {
-        await this.prisma.order.update({
+        await prisma.order.update({
           where: { id: orderId },
           data: {
             status: 'cancelled',
@@ -284,7 +284,7 @@ export class CourierManager {
   // Generate shipping label
   async generateLabel(orderId: string): Promise<string> {
     try {
-      const order = await this.prisma.order.findUnique({
+      const order = await prisma.order.findUnique({
         where: { id: orderId },
         include: { courierPartner: true },
       });
@@ -308,7 +308,7 @@ export class CourierManager {
   // Schedule pickup
   async schedulePickup(orderId: string, pickupDate: Date): Promise<boolean> {
     try {
-      const order = await this.prisma.order.findUnique({
+      const order = await prisma.order.findUnique({
         where: { id: orderId },
         include: { courierPartner: true },
       });
@@ -325,7 +325,7 @@ export class CourierManager {
       const scheduled = await service.schedulePickup(order.courierOrderId, pickupDate);
 
       if (scheduled) {
-        await this.prisma.order.update({
+        await prisma.order.update({
           where: { id: orderId },
           data: {
             status: 'pickup_scheduled',

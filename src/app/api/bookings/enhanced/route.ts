@@ -1,14 +1,13 @@
+import { prisma } from '@/lib/prisma';
 import { CourierManager } from '@/services/courier/manager';
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
 let courierManager: CourierManager | null = null;
 
 // Initialize courier manager if not already done
 async function getCourierManager(): Promise<CourierManager> {
   if (!courierManager) {
-    courierManager = new CourierManager({ prisma });
+    courierManager = new CourierManager();
     await courierManager.initialize();
   }
   return courierManager;
@@ -129,15 +128,11 @@ export async function POST(request: NextRequest) {
       const pickupAddress = await prisma.address.create({
         data: {
           userId: userId,
-          name: body.pickup.name,
-          phone: body.pickup.phone,
-          email: body.pickup.email,
           addressLine1: body.pickup.addressLine1,
           addressLine2: body.pickup.addressLine2,
           city: body.pickup.city,
           state: body.pickup.state,
           pincode: body.pickup.pincode,
-          country: 'India',
           type: 'pickup',
         },
       });
@@ -148,15 +143,11 @@ export async function POST(request: NextRequest) {
       const deliveryAddress = await prisma.address.create({
         data: {
           userId: userId,
-          name: body.delivery.name,
-          phone: body.delivery.phone,
-          email: body.delivery.email,
           addressLine1: body.delivery.addressLine1,
           addressLine2: body.delivery.addressLine2,
           city: body.delivery.city,
           state: body.delivery.state,
           pincode: body.delivery.pincode,
-          country: 'India',
           type: 'delivery',
         },
       });
@@ -360,7 +351,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Order ID or tracking ID is required' }, { status: 400 });
     }
 
-    const whereClause: any = {};
+    const whereClause: { id?: string; courierTrackingId?: string } = {};
     if (orderId) {
       whereClause.id = orderId;
     } else if (trackingId) {
