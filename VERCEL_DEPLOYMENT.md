@@ -111,6 +111,19 @@ Your 500 errors are caused by:
 
 ---
 
+## 🔧 Troubleshooting Environment Variables
+
+If you see "Environment variable not found: DATABASE_URL" error:
+
+1. **Verify in Vercel Dashboard** → Settings → Environment Variables
+2. **Ensure all 3 environments are selected**: Production, Preview, Development
+3. **Redeploy after adding variables**
+4. **Check database connection string is complete**
+
+Last updated: August 30, 2025 - 14:30 IST
+
+---
+
 ## ✅ Status Update
 
 - Database: ✅ Configured
