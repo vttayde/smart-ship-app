@@ -1,44 +1,31 @@
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // For now, return demo address data
-    const demoAddresses = [
-      {
-        id: '1',
-        type: 'PICKUP',
-        name: 'Demo Office',
-        addressLine1: '123 Business Park',
-        addressLine2: 'Tech Hub Area',
-        city: 'Mumbai',
-        state: 'Maharashtra',
-        pincode: '400001',
-        country: 'India',
-        phone: '+91 9876543210',
-        email: 'demo@smartship.com',
-        isDefault: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: '2',
-        type: 'DELIVERY',
-        name: 'Demo Warehouse',
-        addressLine1: '456 Industrial Estate',
-        addressLine2: 'Logistics Zone',
-        city: 'Delhi',
-        state: 'Delhi',
-        pincode: '110001',
-        country: 'India',
-        phone: '+91 9876543211',
-        email: 'warehouse@smartship.com',
-        isDefault: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
+    const session = await getServerSession(authOptions);
 
-    return NextResponse.json({ addresses: demoAddresses });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get user's addresses from database
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      include: {
+        addresses: {
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ addresses: user.addresses });
   } catch (error) {
     console.error('Error fetching addresses:', error);
     return NextResponse.json({ error: 'Failed to fetch addresses' }, { status: 500 });
@@ -47,23 +34,66 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
+    const {
+      type,
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      pincode,
+      latitude,
+      longitude,
+      isDefault,
+    } = body;
 
-    // For demo purposes, just return the submitted data with an ID
-    const newAddress = {
-      id: Math.random().toString(36).substr(2, 9),
-      ...body,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    // Get user ID
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
 
-    return NextResponse.json(
-      {
-        message: 'Address created successfully',
-        address: newAddress,
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // If this is being set as default, unset other defaults
+    if (isDefault) {
+      await prisma.address.updateMany({
+        where: {
+          userId: user.id,
+          type: type,
+        },
+        data: { isDefault: false },
+      });
+    }
+
+    // Create new address
+    const newAddress = await prisma.address.create({
+      data: {
+        userId: user.id,
+        type,
+        addressLine1,
+        addressLine2,
+        city,
+        state,
+        pincode,
+        latitude,
+        longitude,
+        isDefault: isDefault || false,
       },
-      { status: 201 }
-    );
+    });
+
+    return NextResponse.json({
+      message: 'Address created successfully',
+      address: newAddress,
+    });
   } catch (error) {
     console.error('Error creating address:', error);
     return NextResponse.json({ error: 'Failed to create address' }, { status: 500 });

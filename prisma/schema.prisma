@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -17,12 +17,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -118,26 +118,50 @@ model Address {
   @@map("addresses")
 }
 
-// Courier Partners model
+// Courier Partners model - Enhanced for Real API Integration
 model CourierPartner {
   id            String   @id @default(cuid())
   name          String   @unique
+  code          String   @unique  // "delhivery", "shiprocket", "ecom_express", "blue_dart"
+  
+  // API Configuration
   apiEndpoint   String?
   apiKey        String?
-  pricingModel  Json?    // Store pricing configuration as JSON
-  coverageAreas String[] // Array of supported pincodes/cities
-  isActive      Boolean  @default(true)
-  rating        Float    @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  authType      String?  // "bearer", "basic", "apikey", "oauth"
+  isSandbox     Boolean  @default(true)
+  
+  // API Endpoints
+  rateApiEndpoint   String?
+  bookApiEndpoint   String?
+  trackApiEndpoint  String?
+  cancelApiEndpoint String?
+  
+  // Business Configuration
+  pricingModel      Json?    // Store pricing configuration as JSON
+  coverageAreas     Json?    // Store array of supported pincodes/cities as JSON
+  isActive          Boolean  @default(true)
+  rating            Float    @default(0)
+  
+  // Service Capabilities
+  features          String[] // ["cod", "insurance", "priority", "bulk"]
+  minWeight         Float?   // Minimum weight in kg
+  maxWeight         Float?   // Maximum weight in kg
+  avgDeliveryDays   Int      @default(3)
+  
+  // Metadata
+  logo              String?
+  description       String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   // Relations
-  orders        Order[]
+  orders            Order[]
   
   @@map("courier_partners")
 }
 
-// Order model for shipment bookings
+// Order model for shipment bookings - Enhanced for Real Courier Integration
 model Order {
   id                String    @id @default(cuid())
   userId            String
@@ -153,6 +177,18 @@ model Order {
   packageType       String    // document, package, fragile, etc.
   declaredValue     Float?
   
+  // Courier Integration Fields
+  courierOrderId    String?   // Courier's internal order ID
+  courierTrackingId String?   // Courier's tracking number
+  courierStatus     String?   // Courier's status
+  courierResponse   Json?     // Full API response from courier
+  
+  // Shipping Calculation Details
+  actualWeight      Float?    // Courier calculated weight
+  volumetricWeight  Float?    // Courier calculated volumetric weight
+  chargedWeight     Float?    // Final chargeable weight
+  serviceType       String?   // Selected service type (express, standard, etc.)
+  
   // Parcel details
   parcelContents    String?
   dimensions        Json?     // {length, width, height}
@@ -161,6 +197,11 @@ model Order {
   estimatedDelivery DateTime?
   actualDelivery    DateTime?
   deliveryInstructions String?
+  
+  // Enhanced Timestamps
+  bookedAt          DateTime? // When actually booked with courier
+  dispatchedAt      DateTime? // When picked up by courier
+  deliveredAt       DateTime? // When delivered to customer
   
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -179,20 +220,45 @@ model Order {
 
 // Payment model for transaction management
 model Payment {
-  id          String   @id @default(cuid())
-  orderId     String
-  paymentId   String?  // Payment gateway transaction ID
-  amount      Float
-  status      String   @default("pending") // pending, completed, failed, refunded
-  gateway     String   // razorpay, stripe, etc.
-  gatewayRef  String?  // Gateway reference number
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String        @id @default(cuid())
+  orderId             String
+  razorpayOrderId     String?       @unique
+  razorpayPaymentId   String?       @unique
+  razorpaySignature   String?
+  amount              Int           // Amount in paise (Indian currency subunit)
+  currency            String        @default("INR")
+  status              PaymentStatus @default(PENDING)
+  method              PaymentMethod?
+  description         String?
+  notes               String?       // JSON string for additional notes
+  failureReason       String?
+  gateway             String        @default("razorpay")
+  gatewayRef          String?       // Gateway reference number
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  paidAt              DateTime?
 
   // Relations
-  order       Order    @relation(fields: [orderId], references: [id])
+  order               Order         @relation(fields: [orderId], references: [id])
   
   @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  CAPTURED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  NETBANKING
+  WALLET
+  UPI
+  EMI
 }
 
 // Order tracking model for real-time updates
@@ -205,10 +271,20 @@ model OrderTracking {
   longitude Float?
   message   String?
   timestamp DateTime @default(now())
+  
+  // Courier API Data - Enhanced for Real Integration
+  courierStatus    String?  // Raw status from courier API
+  courierLocation  String?  // Location from courier API
+  courierData      Json?    // Full tracking data from courier API
+  description      String?  // Detailed status description
+  expectedDelivery DateTime? // Expected delivery from courier
+  actualDelivery   DateTime? // Actual delivery timestamp
+  remarks          String?  // Additional remarks from courier
 
   // Relations
   order     Order    @relation(fields: [orderId], references: [id])
   
+  @@unique([orderId, timestamp])
   @@map("order_tracking")
 }
 
@@ -225,4 +301,39 @@ model OrderLog {
   order     Order    @relation(fields: [orderId], references: [id])
   
   @@map("order_logs")
+}
+
+// Courier API Configuration - For Real Courier Integration
+model CourierAPIConfig {
+  id            String   @id @default(cuid())
+  courierCode   String   @unique // delhivery, shiprocket, ecom_express, blue_dart
+  courierName   String   // Display name
+  
+  // API Configuration
+  isActive      Boolean  @default(false)
+  environment   String   @default("sandbox") // sandbox, production
+  
+  // API Credentials (encrypted)
+  apiUrl        String?  // Base API URL
+  apiKey        String?  // API Key (encrypted)
+  apiSecret     String?  // API Secret (encrypted)
+  authToken     String?  // Auth Token (encrypted)
+  clientId      String?  // Client ID
+  clientSecret  String?  // Client Secret (encrypted)
+  
+  // API Capabilities
+  capabilities  Json     @default("{}") // Available services and features
+  serviceTypes  Json     @default("[]") // Available service types
+  pincodeList   Json?    // Supported pincodes
+  
+  // Rate Limiting
+  rateLimit     Int      @default(100) // Requests per minute
+  
+  // Configuration metadata
+  configData    Json?    // Additional config parameters
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("courier_api_config")
 }

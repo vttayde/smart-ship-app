@@ -1,11 +1,11 @@
 'use client';
 
+import NotificationSystem from '@/components/notifications/NotificationSystem';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import {
   BarChart3,
-  Bell,
   ChevronDown,
   History,
   LogOut,
@@ -15,7 +15,9 @@ import {
   Plus,
   Search,
   Settings,
+  TrendingUp,
   Truck,
+  Upload,
   User,
   X,
 } from 'lucide-react';
@@ -44,16 +46,18 @@ export default function Header() {
   const publicNavigationItems: NavigationItem[] = [
     { name: 'Home', href: '/' },
     { name: 'Services', href: '/services' },
-    { name: 'Tracking', href: '/tracking' },
+    { name: 'Track Shipment', href: '/tracking/enhanced' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Contact', href: '/contact' },
   ];
 
   const dashboardNavigationItems: NavigationItem[] = [
-    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Ship Now', href: '/ship', icon: Plus },
+    { name: 'Dashboard', href: '/dashboard/enhanced', icon: BarChart3 },
+    { name: 'Ship Now', href: '/shipping/enhanced', icon: Plus },
     { name: 'My Orders', href: '/orders', icon: Package },
-    { name: 'Quotes', href: '/quotes', icon: Search },
+    { name: 'Track', href: '/tracking/enhanced', icon: Search },
+    { name: 'Analytics', href: '/analytics', icon: TrendingUp },
+    { name: 'Bulk Operations', href: '/bulk', icon: Upload },
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
@@ -113,10 +117,7 @@ export default function Header() {
             {isAuthenticated && user ? (
               <div className='flex items-center space-x-4'>
                 {/* Notifications */}
-                <button className='relative p-2 text-gray-400 hover:text-gray-600 transition-colors'>
-                  <Bell className='w-5 h-5' />
-                  <span className='absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400' />
-                </button>
+                <NotificationSystem />
 
                 {/* Quick Ship Button */}
                 {isDashboard && (
