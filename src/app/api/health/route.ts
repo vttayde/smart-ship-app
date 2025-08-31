@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Simple database connectivity test
+    // Database connectivity test with updated environment variables
     await prisma.$queryRaw`SELECT 1`;
 
     // Check if demo users exist
