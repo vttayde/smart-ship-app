@@ -58,13 +58,29 @@ export async function GET() {
       );
     `;
 
+    // Check for missing columns that should exist according to Prisma schema
+    const bookedAtExists = await prisma.$queryRaw`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'orders'
+        AND column_name = 'bookedAt'
+      );
+    `;
+
     let fixAttempted = false;
     const weightExists =
       Array.isArray(weightColumnExists) &&
       weightColumnExists.length > 0 &&
       (weightColumnExists[0] as { exists: boolean }).exists;
 
-    if (!weightExists) {
+    const bookedAtColumnExists =
+      Array.isArray(bookedAtExists) &&
+      bookedAtExists.length > 0 &&
+      (bookedAtExists[0] as { exists: boolean }).exists;
+
+    // Fix the table if either weight or bookedAt columns are missing
+    if (!weightExists || !bookedAtColumnExists) {
       try {
         // Drop and recreate orders table with correct schema
         await prisma.$executeRaw`DROP TABLE IF EXISTS "orders" CASCADE;`;
@@ -95,6 +111,9 @@ export async function GET() {
             "estimatedDelivery" TIMESTAMP(3),
             "actualDelivery" TIMESTAMP(3),
             "deliveryInstructions" TEXT,
+            "bookedAt" TIMESTAMP(3),
+            "dispatchedAt" TIMESTAMP(3),
+            "deliveredAt" TIMESTAMP(3),
             "isInsured" BOOLEAN NOT NULL DEFAULT false,
             "insuranceAmount" DECIMAL(65,30),
             "codAmount" DECIMAL(65,30),
@@ -136,6 +155,7 @@ export async function GET() {
             tables: tablesResult,
             ordersColumns: ordersColumns,
             weightExists: weightExists,
+            bookedAtExists: bookedAtColumnExists,
           },
           { status: 500 }
         );
@@ -160,6 +180,7 @@ export async function GET() {
           tables: tablesResult,
           ordersColumns: ordersColumns,
           weightExists: weightExists,
+          bookedAtExists: bookedAtColumnExists,
           fixAttempted: fixAttempted,
         },
         { status: 500 }
@@ -174,6 +195,7 @@ export async function GET() {
       tables: tablesResult,
       ordersColumns: ordersColumns,
       weightExists: weightExists,
+      bookedAtExists: bookedAtColumnExists,
       fixAttempted: fixAttempted,
       orders: orders,
     });
