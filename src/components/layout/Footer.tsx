@@ -7,37 +7,37 @@ export default function Footer() {
     {
       title: 'Services',
       links: [
-        { name: 'Domestic Shipping', href: '/services/domestic' },
-        { name: 'Express Delivery', href: '/services/express' },
-        { name: 'Package Tracking', href: '/tracking' },
-        { name: 'Bulk Shipping', href: '/services/bulk' },
+        { name: 'Dashboard', href: '/dashboard' },
+        { name: 'Ship Now', href: '/ship' },
+        { name: 'Track Package', href: '/track' },
+        { name: 'Enhanced Tracking', href: '/tracking/enhanced' },
       ],
     },
     {
       title: 'Company',
       links: [
-        { name: 'About Us', href: '/about' },
-        { name: 'Contact', href: '/contact' },
-        { name: 'Careers', href: '/careers' },
-        { name: 'Press', href: '/press' },
+        { name: 'About Us', href: '#about', external: true },
+        { name: 'Contact', href: '#contact', external: true },
+        { name: 'Careers', href: '#careers', external: true },
+        { name: 'Press', href: '#press', external: true },
       ],
     },
     {
       title: 'Support',
       links: [
-        { name: 'Help Center', href: '/help' },
-        { name: 'Shipping Guide', href: '/guide' },
-        { name: 'API Documentation', href: '/docs' },
-        { name: 'Status Page', href: '/status' },
+        { name: 'Help Center', href: '#help', external: true },
+        { name: 'Shipping Guide', href: '#guide', external: true },
+        { name: 'API Documentation', href: '#docs', external: true },
+        { name: 'Status Page', href: '#status', external: true },
       ],
     },
     {
       title: 'Legal',
       links: [
-        { name: 'Privacy Policy', href: '/privacy' },
-        { name: 'Terms of Service', href: '/terms' },
-        { name: 'Cookie Policy', href: '/cookies' },
-        { name: 'Data Protection', href: '/data-protection' },
+        { name: 'Privacy Policy', href: '#privacy', external: true },
+        { name: 'Terms of Service', href: '#terms', external: true },
+        { name: 'Cookie Policy', href: '#cookies', external: true },
+        { name: 'Data Protection', href: '#data-protection', external: true },
       ],
     },
   ];
@@ -103,12 +103,22 @@ export default function Footer() {
               <ul className='space-y-3'>
                 {section.links.map(link => (
                   <li key={link.name}>
-                    <Link
-                      href={link.href}
-                      className='text-sm text-gray-600 hover:text-gray-900 transition-colors'
-                    >
-                      {link.name}
-                    </Link>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        className='text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer'
+                        onClick={e => e.preventDefault()}
+                      >
+                        {link.name} <span className='text-xs text-gray-400'>(Coming Soon)</span>
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className='text-sm text-gray-600 hover:text-gray-900 transition-colors'
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
