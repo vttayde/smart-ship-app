@@ -2,7 +2,8 @@
 
 A modern shipping management application built with Next.js 15, TypeScript, and Tailwind CSS.
 
-> CI/CD pipeline configured with Vercel deployment ✅
+> CI/CD pipeline configured with Vercel deployment ✅  
+> Staging workflow fixed and tested ✅
 
 ## 🎯 Project Overview
 

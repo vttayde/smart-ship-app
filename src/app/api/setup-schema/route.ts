@@ -2,11 +2,9 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Use Prisma's programmatic schema push
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
 
-    // Test basic connection first
     await prisma.$connect();
 
     // Create enum types first
@@ -18,64 +16,62 @@ export async function GET() {
       END $$;
     `;
 
-    // Try to create tables using raw SQL based on our schema
+    // Create the essential tables for dashboard to work
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "accounts" (
+      CREATE TABLE IF NOT EXISTS "courier_partners" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "name" TEXT NOT NULL UNIQUE,
+        "code" TEXT NOT NULL UNIQUE,
+        "apiEndpoint" TEXT,
+        "apiKey" TEXT,
+        "authType" TEXT,
+        "isSandbox" BOOLEAN NOT NULL DEFAULT true,
+        "isActive" BOOLEAN NOT NULL DEFAULT true,
+        "rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
+        "avgDeliveryDays" INTEGER NOT NULL DEFAULT 3,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "addresses" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "userId" TEXT NOT NULL,
         "type" TEXT NOT NULL,
-        "provider" TEXT NOT NULL,
-        "providerAccountId" TEXT NOT NULL,
-        "refresh_token" TEXT,
-        "access_token" TEXT,
-        "expires_at" INTEGER,
-        "token_type" TEXT,
-        "scope" TEXT,
-        "id_token" TEXT,
-        "session_state" TEXT,
+        "addressLine1" TEXT NOT NULL,
+        "addressLine2" TEXT,
+        "city" TEXT NOT NULL,
+        "state" TEXT NOT NULL,
+        "pincode" TEXT NOT NULL,
+        "latitude" DOUBLE PRECISION,
+        "longitude" DOUBLE PRECISION,
+        "isDefault" BOOLEAN NOT NULL DEFAULT false,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `;
 
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "sessions" (
+      CREATE TABLE IF NOT EXISTS "orders" (
         "id" TEXT NOT NULL PRIMARY KEY,
-        "sessionToken" TEXT NOT NULL UNIQUE,
         "userId" TEXT NOT NULL,
-        "expires" TIMESTAMP(3) NOT NULL,
+        "courierPartnerId" TEXT NOT NULL,
+        "pickupAddressId" TEXT NOT NULL,
+        "deliveryAddressId" TEXT NOT NULL,
+        "trackingNumber" TEXT,
+        "status" TEXT NOT NULL DEFAULT 'PENDING',
+        "serviceType" TEXT NOT NULL,
+        "parcelContents" TEXT NOT NULL,
+        "dimensions" JSONB NOT NULL,
+        "declaredValue" DOUBLE PRECISION NOT NULL,
+        "totalAmount" DOUBLE PRECISION NOT NULL,
+        "paymentStatus" TEXT NOT NULL DEFAULT 'PENDING',
+        "estimatedDelivery" TIMESTAMP(3),
+        "actualDelivery" TIMESTAMP(3),
+        "deliveryInstructions" TEXT,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
-
-    await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "users" (
-        "id" TEXT NOT NULL PRIMARY KEY,
-        "name" TEXT,
-        "email" TEXT UNIQUE,
-        "emailVerified" TIMESTAMP(3),
-        "image" TEXT,
-        "phone" TEXT UNIQUE,
-        "firstName" TEXT,
-        "lastName" TEXT,
-        "company" TEXT,
-        "gstin" TEXT,
-        "passwordHash" TEXT,
-        "phoneVerified" BOOLEAN DEFAULT false,
-        "role" "UserRole" DEFAULT 'USER',
-        "isActive" BOOLEAN DEFAULT true,
-        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "lastLoginAt" TIMESTAMP(3)
-      );
-    `; // Create other required tables
-    await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "verification_tokens" (
-        "identifier" TEXT NOT NULL,
-        "token" TEXT NOT NULL,
-        "expires" TIMESTAMP(3) NOT NULL,
-        UNIQUE("identifier", "token")
       );
     `;
 
@@ -83,15 +79,16 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      message: 'Database schema created successfully',
+      message: 'Complete database schema created successfully',
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Database setup error:', error);
+    console.error('Schema setup error:', error);
     return NextResponse.json(
       {
-        error: 'Failed to setup database',
-        details: error instanceof Error ? error.message : String(error),
+        success: false,
+        error: 'Failed to create schema',
+        details: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString(),
       },
       { status: 500 }

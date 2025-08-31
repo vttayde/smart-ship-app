@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Layout from '@/components/layout/Layout';
+import TestimonialsSection from '@/components/sections/TestimonialsSection';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import {
@@ -11,13 +12,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import Layout from '@/components/layout/Layout';
-import TestimonialsSection from '@/components/sections/TestimonialsSection';
-import { Truck, MapPin, Clock, Shield, Star, ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, Clock, MapPin, Shield, Star, Truck } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
+  const [isStaging, setIsStaging] = useState(false);
+
+  // Check for staging environment on client side only to prevent hydration mismatch
+  useEffect(() => {
+    setIsStaging(
+      process.env.NODE_ENV === 'production' && window.location.hostname.includes('staging')
+    );
+  }, []);
 
   const handleSearch = () => {
     // Redirect to detailed shipping form
@@ -26,6 +35,13 @@ export default function Home() {
 
   return (
     <Layout>
+      {/* Staging Environment Indicator */}
+      {isStaging && (
+        <div className='bg-yellow-400 text-black text-center py-2 px-4 font-semibold'>
+          🚧 STAGING ENVIRONMENT - This is a test deployment from the staging branch
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className='relative bg-gradient-to-br from-blue-50 via-white to-blue-50 py-20'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
