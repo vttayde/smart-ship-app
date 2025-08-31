@@ -79,24 +79,39 @@ export async function GET() {
       END $$;
     `;
 
+    // Drop and recreate orders table with complete schema
+    await prisma.$executeRaw`DROP TABLE IF EXISTS "orders" CASCADE;`;
+
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "orders" (
+      CREATE TABLE "orders" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "userId" TEXT NOT NULL,
         "courierPartnerId" TEXT NOT NULL,
         "pickupAddressId" TEXT NOT NULL,
         "deliveryAddressId" TEXT NOT NULL,
         "trackingNumber" TEXT,
-        "status" TEXT NOT NULL DEFAULT 'PENDING',
-        "serviceType" TEXT NOT NULL,
-        "parcelContents" TEXT NOT NULL,
-        "dimensions" JSONB NOT NULL,
-        "declaredValue" DOUBLE PRECISION NOT NULL,
-        "totalAmount" DOUBLE PRECISION NOT NULL,
-        "paymentStatus" TEXT NOT NULL DEFAULT 'PENDING',
+        "status" TEXT NOT NULL DEFAULT 'pending',
+        "totalAmount" DECIMAL(65,30) NOT NULL,
+        "weight" DECIMAL(65,30) NOT NULL,
+        "packageType" TEXT NOT NULL,
+        "declaredValue" DECIMAL(65,30),
+        "courierOrderId" TEXT,
+        "courierTrackingId" TEXT,
+        "courierStatus" TEXT,
+        "courierResponse" JSONB,
+        "actualWeight" DECIMAL(65,30),
+        "volumetricWeight" DECIMAL(65,30),
+        "chargedWeight" DECIMAL(65,30),
+        "serviceType" TEXT,
+        "parcelContents" TEXT,
+        "dimensions" JSONB,
         "estimatedDelivery" TIMESTAMP(3),
         "actualDelivery" TIMESTAMP(3),
         "deliveryInstructions" TEXT,
+        "isInsured" BOOLEAN NOT NULL DEFAULT false,
+        "insuranceAmount" DECIMAL(65,30),
+        "codAmount" DECIMAL(65,30),
+        "notes" TEXT,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
