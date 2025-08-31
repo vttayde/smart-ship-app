@@ -52,6 +52,17 @@ export async function GET() {
       );
     `;
 
+    // Add foreign key constraints
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        ALTER TABLE "addresses" 
+        ADD CONSTRAINT "addresses_userId_fkey" 
+        FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
     await prisma.$executeRaw`
       CREATE TABLE IF NOT EXISTS "orders" (
         "id" TEXT NOT NULL PRIMARY KEY,
@@ -73,6 +84,47 @@ export async function GET() {
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
+    `;
+
+    // Add foreign key constraints for orders
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        ALTER TABLE "orders" 
+        ADD CONSTRAINT "orders_userId_fkey" 
+        FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        ALTER TABLE "orders" 
+        ADD CONSTRAINT "orders_courierPartnerId_fkey" 
+        FOREIGN KEY ("courierPartnerId") REFERENCES "courier_partners"("id") ON DELETE RESTRICT;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        ALTER TABLE "orders" 
+        ADD CONSTRAINT "orders_pickupAddressId_fkey" 
+        FOREIGN KEY ("pickupAddressId") REFERENCES "addresses"("id") ON DELETE RESTRICT;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        ALTER TABLE "orders" 
+        ADD CONSTRAINT "orders_deliveryAddressId_fkey" 
+        FOREIGN KEY ("deliveryAddressId") REFERENCES "addresses"("id") ON DELETE RESTRICT;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
     `;
 
     await prisma.$disconnect();
