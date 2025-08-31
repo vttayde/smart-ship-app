@@ -280,8 +280,8 @@ export function usePWA() {
       if (Notification.permission === 'granted') {
         navigator.serviceWorker.ready.then(registration => {
           registration.showNotification(title, {
-            icon: '/icons/icon-192x192.png',
-            badge: '/icons/badge-72x72.png',
+            icon: '/icons/icon-192x192.svg',
+            badge: '/icons/icon-32x32.svg',
             ...options,
           });
         });
