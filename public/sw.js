@@ -1,15 +1,8 @@
-const CACHE_NAME = 'smart-ship-v1.0.1';
+const CACHE_NAME = 'smart-ship-v1.0.2';
 const OFFLINE_URL = '/';
 
 // Critical resources to cache for offline functionality
-const CRITICAL_RESOURCES = [
-  '/',
-  '/dashboard',
-  '/auth/login',
-  '/auth/signup',
-  // CSS and JS files will be added by Next.js automatically
-  '/manifest.json',
-];
+const CRITICAL_RESOURCES = ['/', '/manifest.json'];
 
 // API endpoints to cache for offline access
 const _API_CACHE_PATTERNS = ['/api/shipments', '/api/tracking', '/api/analytics'];
@@ -23,7 +16,15 @@ self.addEventListener('install', event => {
       .open(CACHE_NAME)
       .then(cache => {
         console.warn('SmartShip Service Worker: Caching critical resources');
-        return cache.addAll(CRITICAL_RESOURCES);
+        // Cache resources individually to handle failures gracefully
+        return Promise.allSettled(
+          CRITICAL_RESOURCES.map(url =>
+            cache.add(url).catch(err => {
+              console.warn(`Failed to cache ${url}:`, err);
+              return null;
+            })
+          )
+        );
       })
       .then(() => {
         console.warn('SmartShip Service Worker: Installation complete');
