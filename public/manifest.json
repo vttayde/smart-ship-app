@@ -38,56 +38,28 @@
   ],
   "shortcuts": [
     {
-      "name": "Ship Now",
-      "short_name": "Ship",
-      "description": "Create a new shipment quickly",
-      "url": "/shipping/enhanced",
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Go to dashboard",
+      "url": "/dashboard",
       "icons": [
         {
-          "src": "/icons/shortcut-ship.png",
-          "sizes": "96x96"
+          "src": "/icons/icon-192x192.svg",
+          "sizes": "192x192"
         }
       ]
     },
     {
-      "name": "Track Package",
-      "short_name": "Track",
-      "description": "Track your shipments",
-      "url": "/tracking/enhanced",
+      "name": "Login",
+      "short_name": "Login",
+      "description": "Sign in to your account",
+      "url": "/auth/login",
       "icons": [
         {
-          "src": "/icons/shortcut-track.png",
-          "sizes": "96x96"
+          "src": "/icons/icon-192x192.svg",
+          "sizes": "192x192"
         }
       ]
-    },
-    {
-      "name": "Analytics",
-      "short_name": "Analytics",
-      "description": "View shipping analytics",
-      "url": "/analytics",
-      "icons": [
-        {
-          "src": "/icons/shortcut-analytics.png",
-          "sizes": "96x96"
-        }
-      ]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop-dashboard.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Desktop Dashboard View"
-    },
-    {
-      "src": "/screenshots/mobile-shipping.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Mobile Shipping Interface"
     }
   ],
   "related_applications": [],
