@@ -11,7 +11,7 @@ export async function GET() {
 
     // Try to create tables using raw SQL based on our schema
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "Account" (
+      CREATE TABLE IF NOT EXISTS "accounts" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "userId" TEXT NOT NULL,
         "type" TEXT NOT NULL,
@@ -30,7 +30,7 @@ export async function GET() {
     `;
 
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "Session" (
+      CREATE TABLE IF NOT EXISTS "sessions" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "sessionToken" TEXT NOT NULL UNIQUE,
         "userId" TEXT NOT NULL,
@@ -41,27 +41,32 @@ export async function GET() {
     `;
 
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "User" (
+      CREATE TABLE IF NOT EXISTS "users" (
         "id" TEXT NOT NULL PRIMARY KEY,
         "name" TEXT,
         "email" TEXT UNIQUE,
         "emailVerified" TIMESTAMP(3),
         "image" TEXT,
-        "password" TEXT,
+        "phone" TEXT UNIQUE,
+        "firstName" TEXT,
+        "lastName" TEXT,
+        "company" TEXT,
+        "gstin" TEXT,
+        "passwordHash" TEXT,
+        "phoneVerified" BOOLEAN DEFAULT false,
         "role" TEXT DEFAULT 'USER',
-        "phone" TEXT,
-        "companyName" TEXT,
+        "isActive" BOOLEAN DEFAULT true,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "lastLoginAt" TIMESTAMP(3)
       );
-    `;
-
-    // Create other required tables
+    `; // Create other required tables
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "VerificationToken" (
+      CREATE TABLE IF NOT EXISTS "verification_tokens" (
         "identifier" TEXT NOT NULL,
         "token" TEXT NOT NULL,
-        "expires" TIMESTAMP(3) NOT NULL
+        "expires" TIMESTAMP(3) NOT NULL,
+        UNIQUE("identifier", "token")
       );
     `;
 
