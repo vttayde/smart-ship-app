@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const dbUrl = process.env.DATABASE_URL;
-    
+
     if (!dbUrl) {
       return NextResponse.json({
         error: 'DATABASE_URL not found',
