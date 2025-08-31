@@ -16,6 +16,22 @@ export async function GET() {
       END $$;
     `;
 
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'PROCESSING', 'CAPTURED', 'FAILED', 'REFUNDED', 'PARTIALLY_REFUNDED');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        CREATE TYPE "PaymentMethod" AS ENUM ('CARD', 'NETBANKING', 'WALLET', 'UPI', 'COD');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
     // Create the essential tables for dashboard to work
     await prisma.$executeRaw`
       CREATE TABLE IF NOT EXISTS "courier_partners" (
@@ -122,6 +138,57 @@ export async function GET() {
         ALTER TABLE "orders" 
         ADD CONSTRAINT "orders_deliveryAddressId_fkey" 
         FOREIGN KEY ("deliveryAddressId") REFERENCES "addresses"("id") ON DELETE RESTRICT;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
+    // Create payments table
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "payments" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "orderId" TEXT NOT NULL,
+        "amount" DOUBLE PRECISION NOT NULL,
+        "currency" TEXT NOT NULL DEFAULT 'INR',
+        "status" TEXT NOT NULL DEFAULT 'PENDING',
+        "method" TEXT,
+        "transactionId" TEXT,
+        "gatewayResponse" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Add foreign key for payments
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        ALTER TABLE "payments" 
+        ADD CONSTRAINT "payments_orderId_fkey" 
+        FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
+    // Create tracking updates table (OrderTracking model)
+    await prisma.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "order_tracking" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "orderId" TEXT NOT NULL,
+        "status" TEXT NOT NULL,
+        "location" TEXT,
+        "description" TEXT,
+        "timestamp" TIMESTAMP(3) NOT NULL,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Add foreign key for tracking updates
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        ALTER TABLE "order_tracking" 
+        ADD CONSTRAINT "order_tracking_orderId_fkey" 
+        FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE;
       EXCEPTION
         WHEN duplicate_object THEN null;
       END $$;
