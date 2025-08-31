@@ -2,166 +2,202 @@
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Bell, Globe, Shield, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState('profile');
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: false,
+    sms: false,
+  });
+  const [accountSettings, setAccountSettings] = useState({
+    theme: 'light',
+    language: 'en',
+    timezone: 'UTC',
+  });
 
-  const tabs = [
-    { id: 'profile', name: 'Profile', icon: User },
-    { id: 'notifications', name: 'Notifications', icon: Bell },
-    { id: 'security', name: 'Security', icon: Shield },
-    { id: 'preferences', name: 'Preferences', icon: Globe },
-  ];
+  useEffect(() => {
+    if (status === 'loading') return;
+    if (!session) {
+      router.push('/auth/login');
+    }
+  }, [session, status, router]);
+
+  const handleNotificationChange = (type: keyof typeof notifications) => {
+    setNotifications(prev => ({
+      ...prev,
+      [type]: !prev[type],
+    }));
+  };
+
+  const handleAccountSettingChange = (setting: keyof typeof accountSettings, value: string) => {
+    setAccountSettings(prev => ({
+      ...prev,
+      [setting]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    // Save settings logic would go here
+    alert('Settings saved successfully!');
+  };
+
+  if (status === 'loading') {
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='text-center'>Loading...</div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
+  }
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <div className='max-w-7xl mx-auto py-6 sm:px-6 lg:px-8'>
-        <div className='px-4 py-6 sm:px-0'>
-          <div className='mb-6'>
-            <h1 className='text-3xl font-bold text-gray-900'>Settings</h1>
-            <p className='mt-1 text-sm text-gray-500'>
-              Manage your account settings and preferences.
-            </p>
-          </div>
+    <div className='min-h-screen bg-gray-50 py-8'>
+      <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='mb-8'>
+          <h1 className='text-3xl font-bold text-gray-900'>Settings</h1>
+          <p className='mt-2 text-gray-600'>Manage your account preferences and notifications</p>
+        </div>
 
-          <div className='flex flex-col lg:flex-row gap-6'>
-            {/* Sidebar */}
-            <div className='lg:w-64'>
-              <nav className='space-y-1'>
-                {tabs.map(tab => {
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                        activeTab === tab.id
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                      }`}
-                    >
-                      <Icon className='w-4 h-4 mr-3' />
-                      {tab.name}
-                    </button>
-                  );
-                })}
-              </nav>
+        <div className='space-y-6'>
+          {/* Account Information */}
+          <Card className='p-6'>
+            <h2 className='text-lg font-semibold text-gray-900 mb-4'>Account Information</h2>
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700'>Name</label>
+                <p className='mt-1 text-sm text-gray-900'>{session.user?.name || 'Not provided'}</p>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700'>Email</label>
+                <p className='mt-1 text-sm text-gray-900'>
+                  {session.user?.email || 'Not provided'}
+                </p>
+              </div>
             </div>
+          </Card>
 
-            {/* Content */}
-            <div className='flex-1'>
-              <Card className='p-6'>
-                {activeTab === 'profile' && (
-                  <div>
-                    <h2 className='text-lg font-medium text-gray-900 mb-4'>Profile Information</h2>
-                    <div className='space-y-4'>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700'>Name</label>
-                        <Input
-                          type='text'
-                          defaultValue={session?.user?.name || ''}
-                          className='mt-1'
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700'>Email</label>
-                        <Input
-                          type='email'
-                          defaultValue={session?.user?.email || ''}
-                          className='mt-1'
-                          disabled
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700'>Phone</label>
-                        <Input type='tel' placeholder='Enter your phone number' className='mt-1' />
-                      </div>
-                      <Button>Save Changes</Button>
-                    </div>
-                  </div>
-                )}
+          {/* Notification Settings */}
+          <Card className='p-6'>
+            <h2 className='text-lg font-semibold text-gray-900 mb-4'>Notification Preferences</h2>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <label className='text-sm font-medium text-gray-700'>Email Notifications</label>
+                  <p className='text-sm text-gray-500'>Receive notifications via email</p>
+                </div>
+                <button
+                  onClick={() => handleNotificationChange('email')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notifications.email ? 'bg-blue-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      notifications.email ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
 
-                {activeTab === 'notifications' && (
-                  <div>
-                    <h2 className='text-lg font-medium text-gray-900 mb-4'>
-                      Notification Preferences
-                    </h2>
-                    <div className='space-y-4'>
-                      <div className='flex items-center justify-between'>
-                        <div>
-                          <h3 className='text-sm font-medium text-gray-900'>Email notifications</h3>
-                          <p className='text-sm text-gray-500'>
-                            Receive email updates about your orders
-                          </p>
-                        </div>
-                        <input
-                          type='checkbox'
-                          className='h-4 w-4 text-blue-600 rounded'
-                          defaultChecked
-                        />
-                      </div>
-                      <div className='flex items-center justify-between'>
-                        <div>
-                          <h3 className='text-sm font-medium text-gray-900'>SMS notifications</h3>
-                          <p className='text-sm text-gray-500'>
-                            Receive SMS updates about order status
-                          </p>
-                        </div>
-                        <input type='checkbox' className='h-4 w-4 text-blue-600 rounded' />
-                      </div>
-                      <Button>Save Preferences</Button>
-                    </div>
-                  </div>
-                )}
+              <div className='flex items-center justify-between'>
+                <div>
+                  <label className='text-sm font-medium text-gray-700'>Push Notifications</label>
+                  <p className='text-sm text-gray-500'>
+                    Receive push notifications in your browser
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleNotificationChange('push')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notifications.push ? 'bg-blue-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      notifications.push ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
 
-                {activeTab === 'security' && (
-                  <div>
-                    <h2 className='text-lg font-medium text-gray-900 mb-4'>Security Settings</h2>
-                    <div className='space-y-4'>
-                      <div>
-                        <h3 className='text-sm font-medium text-gray-900 mb-2'>Change Password</h3>
-                        <div className='space-y-3'>
-                          <Input type='password' placeholder='Current password' />
-                          <Input type='password' placeholder='New password' />
-                          <Input type='password' placeholder='Confirm new password' />
-                        </div>
-                      </div>
-                      <Button>Update Password</Button>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'preferences' && (
-                  <div>
-                    <h2 className='text-lg font-medium text-gray-900 mb-4'>Preferences</h2>
-                    <div className='space-y-4'>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700'>Language</label>
-                        <select className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'>
-                          <option>English</option>
-                          <option>Hindi</option>
-                          <option>Spanish</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700'>Timezone</label>
-                        <select className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'>
-                          <option>Asia/Kolkata</option>
-                          <option>America/New_York</option>
-                          <option>Europe/London</option>
-                        </select>
-                      </div>
-                      <Button>Save Preferences</Button>
-                    </div>
-                  </div>
-                )}
-              </Card>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <label className='text-sm font-medium text-gray-700'>SMS Notifications</label>
+                  <p className='text-sm text-gray-500'>Receive notifications via SMS</p>
+                </div>
+                <button
+                  onClick={() => handleNotificationChange('sms')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notifications.sms ? 'bg-blue-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      notifications.sms ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
             </div>
+          </Card>
+
+          {/* App Settings */}
+          <Card className='p-6'>
+            <h2 className='text-lg font-semibold text-gray-900 mb-4'>App Preferences</h2>
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Theme</label>
+                <select
+                  value={accountSettings.theme}
+                  onChange={e => handleAccountSettingChange('theme', e.target.value)}
+                  className='w-full border border-gray-300 rounded-md px-3 py-2 text-sm'
+                >
+                  <option value='light'>Light</option>
+                  <option value='dark'>Dark</option>
+                  <option value='system'>System</option>
+                </select>
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Language</label>
+                <select
+                  value={accountSettings.language}
+                  onChange={e => handleAccountSettingChange('language', e.target.value)}
+                  className='w-full border border-gray-300 rounded-md px-3 py-2 text-sm'
+                >
+                  <option value='en'>English</option>
+                  <option value='hi'>Hindi</option>
+                  <option value='mr'>Marathi</option>
+                </select>
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>Timezone</label>
+                <select
+                  value={accountSettings.timezone}
+                  onChange={e => handleAccountSettingChange('timezone', e.target.value)}
+                  className='w-full border border-gray-300 rounded-md px-3 py-2 text-sm'
+                >
+                  <option value='UTC'>UTC</option>
+                  <option value='Asia/Kolkata'>India Standard Time</option>
+                  <option value='America/New_York'>Eastern Time</option>
+                  <option value='America/Los_Angeles'>Pacific Time</option>
+                </select>
+              </div>
+            </div>
+          </Card>
+
+          {/* Save Button */}
+          <div className='flex justify-end'>
+            <Button onClick={handleSave}>Save Settings</Button>
           </div>
         </div>
       </div>

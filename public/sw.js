@@ -295,12 +295,10 @@ self.addEventListener('push', event => {
       {
         action: 'view',
         title: 'View Details',
-        icon: '/icons/action-view.png',
       },
       {
         action: 'dismiss',
         title: 'Dismiss',
-        icon: '/icons/action-dismiss.png',
       },
     ],
     requireInteraction: data.requireInteraction || false,

@@ -11,32 +11,28 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user first
+    // Get user's orders from database
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
+      include: {
+        orders: {
+          include: {
+            pickupAddress: true,
+            deliveryAddress: true,
+            courierPartner: true,
+            payments: true,
+            trackingUpdates: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
     });
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Get orders with only basic fields that exist in the database
-    const orders = await prisma.order.findMany({
-      where: { userId: user.id },
-      select: {
-        id: true,
-        trackingNumber: true,
-        status: true,
-        totalAmount: true,
-        weight: true,
-        packageType: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    return NextResponse.json({ orders });
+    return NextResponse.json({ orders: user.orders });
   } catch (error) {
     console.error('Error fetching orders:', error);
     return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
