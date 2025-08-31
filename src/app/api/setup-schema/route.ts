@@ -9,6 +9,15 @@ export async function GET() {
     // Test basic connection first
     await prisma.$connect();
 
+    // Create enum types first
+    await prisma.$executeRaw`
+      DO $$ BEGIN
+        CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN', 'SUPER_ADMIN');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `;
+
     // Try to create tables using raw SQL based on our schema
     await prisma.$executeRaw`
       CREATE TABLE IF NOT EXISTS "accounts" (
@@ -54,7 +63,7 @@ export async function GET() {
         "gstin" TEXT,
         "passwordHash" TEXT,
         "phoneVerified" BOOLEAN DEFAULT false,
-        "role" TEXT DEFAULT 'USER',
+        "role" "UserRole" DEFAULT 'USER',
         "isActive" BOOLEAN DEFAULT true,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
