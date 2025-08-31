@@ -1,14 +1,12 @@
-const CACHE_NAME = 'smart-ship-v1.0.0';
-const OFFLINE_URL = '/offline';
+const CACHE_NAME = 'smart-ship-v1.0.1';
+const OFFLINE_URL = '/';
 
 // Critical resources to cache for offline functionality
 const CRITICAL_RESOURCES = [
   '/',
-  '/offline',
   '/dashboard',
-  '/shipping/enhanced',
-  '/tracking/enhanced',
-  '/analytics',
+  '/auth/login',
+  '/auth/signup',
   // CSS and JS files will be added by Next.js automatically
   '/manifest.json',
 ];
