@@ -2,8 +2,16 @@
 
 A modern shipping management application built with Next.js 15, TypeScript, and Tailwind CSS.
 
-> CI/CD pipeline configured with Vercel deployment ✅  
-> Staging workflow fixed and tested ✅
+## 🌐 Live Deployments
+
+| Environment    | Status                                                                                                              | URL                                      | Branch    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | --------- |
+| **Production** | [![Deployment](https://img.shields.io/badge/deployment-production-green)](https://smart-ship-production.vercel.app) | https://smart-ship-production.vercel.app | `main`    |
+| **Staging**    | [![Deployment](https://img.shields.io/badge/deployment-staging-yellow)](https://smart-ship-staging.vercel.app)      | https://smart-ship-staging.vercel.app    | `staging` |
+
+> ✅ CI/CD pipeline configured with Vercel deployment  
+> ✅ Multi-environment deployments (Production + Staging)  
+> ✅ Automated workflows with GitHub Actions
 
 ## 🎯 Project Overview
 
@@ -69,7 +77,33 @@ A modern shipping management application built with Next.js 15, TypeScript, and 
    http://localhost:3000
    ```
 
-## 📁 Project Structure
+## � Deployment & CI/CD
+
+### **Automated Deployments**
+
+The project uses GitHub Actions for automated deployments to Vercel:
+
+- **Production**: Deploys automatically when code is pushed to `main` branch
+- **Staging**: Deploys automatically when code is pushed to `staging` branch
+- **Preview**: Creates preview deployments for Pull Requests
+
+### **Branch Strategy**
+
+| Branch      | Purpose               | Auto Deploy   | URL                                      |
+| ----------- | --------------------- | ------------- | ---------------------------------------- |
+| `main`      | Production-ready code | ✅ Production | https://smart-ship-production.vercel.app |
+| `staging`   | Testing & QA          | ✅ Staging    | https://smart-ship-staging.vercel.app    |
+| `feature/*` | Development           | ✅ Preview    | Generated preview URLs                   |
+
+### **Deployment Status**
+
+- ✅ **GitHub Actions**: Automated CI/CD pipeline
+- ✅ **Vercel Integration**: Seamless deployments
+- ✅ **Environment Separation**: Production and staging environments
+- ✅ **Database**: PostgreSQL with Neon (configured)
+- ✅ **Authentication**: NextAuth.js setup (configured)
+
+## �📁 Project Structure
 
 ```
 ship-smart/
