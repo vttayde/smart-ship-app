@@ -3,9 +3,20 @@ name: Deploy to Staging
 on:
   push:
     branches: [develop, staging]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'project-docs/**'
+      - 'DEPLOYMENT_OPTIMIZATION.md'
+      - 'ENVIRONMENTS.md'
+      - 'GITHUB_ABOUT_UPDATE.md'
   pull_request:
     branches: [main]
     types: [opened, synchronize]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'project-docs/**'
 
 permissions:
   contents: read
@@ -21,6 +32,8 @@ jobs:
   deploy-preview:
     name: Deploy Preview
     runs-on: ubuntu-latest
+    # Skip deployment if commit message contains [skip-deploy]
+    if: "!contains(github.event.head_commit.message, '[skip-deploy]')"
 
     steps:
       - name: Checkout code
