@@ -20,13 +20,19 @@ Navigate to: `https://github.com/vttayde/smart-ship-app`
 **Description:**
 
 ```
-🚚 Smart Ship - AI-powered logistics aggregation platform for India. Compare courier rates, book shipments, and track packages in real-time.
+🚚 Smart Ship - Modern shipping management platform with multi-environment deployment. Production & Staging available via Vercel.
 ```
 
 **Website URL:**
 
 ```
 https://smart-ship-production.vercel.app
+```
+
+**Alternative Option - Include Both Environments in Description:**
+
+```
+🚚 Smart Ship - Shipping management platform | 🟢 Production: smart-ship-production.vercel.app | 🟡 Staging: smart-ship-staging.vercel.app
 ```
 
 **Topics (Add these tags):**

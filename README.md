@@ -2,6 +2,11 @@
 
 A modern shipping management application built with Next.js 15, TypeScript, and Tailwind CSS.
 
+## 🚀 Quick Access
+
+[![Production](https://img.shields.io/badge/🟢_Production-Launch_App-brightgreen?style=for-the-badge)](https://smart-ship-production.vercel.app)
+[![Staging](https://img.shields.io/badge/🟡_Staging-Test_App-yellow?style=for-the-badge)](https://smart-ship-staging.vercel.app)
+
 ## 🌐 Live Deployments
 
 | Environment    | Status                                                                                                              | URL                                      | Branch    |
