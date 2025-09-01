@@ -7,18 +7,21 @@ This guide helps you test all recent changes locally using the staging database,
 ## 🔍 Recent Changes Summary
 
 ### ✅ **Deployment Optimizations**
+
 - **Path-based deployment skipping** for `.md` files and documentation
 - **Commit message deployment control** with `[skip-deploy]` keyword
 - **Reduced deployment frequency** by 70-80%
 - **Intelligent CI/CD triggers** to stay within Vercel free tier limits
 
 ### ✅ **New Documentation**
+
 - `DEPLOYMENT_OPTIMIZATION.md` - Strategy guide for efficient deployments
 - `DEVELOPMENT_WORKFLOW.md` - Best practices for daily development
 - `ENVIRONMENTS.md` - Environment access and management
 - `GITHUB_ABOUT_UPDATE.md` - Repository presentation guide
 
 ### ✅ **Environment Enhancements**
+
 - **Multi-environment visibility** in README and documentation
 - **Environment selector page** at `/` route
 - **Professional repository presentation**
@@ -84,6 +87,7 @@ npm run test:staging
 ```
 
 This will:
+
 - ✅ Backup your current `.env.local`
 - ✅ Switch to staging database configuration
 - ✅ Generate Prisma client for staging schema
@@ -92,6 +96,7 @@ This will:
 ### **Step 4: Test Key Features**
 
 #### **🔐 Authentication Testing**
+
 ```bash
 # Visit: http://localhost:3003/auth/login
 # Test: Login with staging database credentials
@@ -99,6 +104,7 @@ This will:
 ```
 
 #### **📊 Dashboard Testing**
+
 ```bash
 # Visit: http://localhost:3003/dashboard
 # Test: Orders API with real staging data
@@ -106,6 +112,7 @@ This will:
 ```
 
 #### **🚀 PWA Testing**
+
 ```bash
 # Test: Service worker functionality
 # Test: Manifest.json accessibility
@@ -113,6 +120,7 @@ This will:
 ```
 
 #### **📱 Responsive Testing**
+
 ```bash
 # Test: Mobile layout and navigation
 # Test: All interactive components
@@ -122,6 +130,7 @@ This will:
 ### **Step 5: Test Deployment Optimizations**
 
 #### **Test Documentation Updates (Should Skip Deployment)**
+
 ```bash
 # Make a documentation change
 echo "# Test update" >> TEST_DOC.md
@@ -139,6 +148,7 @@ rm TEST_DOC.md
 ```
 
 #### **Test Code Changes (Should Deploy)**
+
 ```bash
 # Make a code change
 # Commit without [skip-deploy]
@@ -151,6 +161,7 @@ git push origin main
 ## 🔧 **Environment Configuration**
 
 ### **Local Development (.env.local)**
+
 ```bash
 DATABASE_URL="postgresql://local-db-url"
 NEXTAUTH_URL="http://localhost:3003"
@@ -158,6 +169,7 @@ NODE_ENV="development"
 ```
 
 ### **Local + Staging DB (.env.staging-local)**
+
 ```bash
 DATABASE_URL="postgresql://staging-db-url"
 NEXTAUTH_URL="http://localhost:3003"
@@ -171,6 +183,7 @@ DEBUG_MODE="true"
 ### **Common Issues & Solutions**
 
 #### **Issue: Database Connection Error**
+
 ```bash
 # Solution: Check staging database URL
 npx prisma db pull  # Test connection
@@ -178,12 +191,14 @@ npx prisma generate # Regenerate client
 ```
 
 #### **Issue: Authentication Not Working**
+
 ```bash
 # Solution: Verify NEXTAUTH_SECRET and URL
 # Check .env.local configuration
 ```
 
 #### **Issue: Build Errors**
+
 ```bash
 # Solution: Clear Next.js cache
 rm -rf .next
@@ -191,6 +206,7 @@ npm run dev
 ```
 
 #### **Issue: Prisma Schema Mismatch**
+
 ```bash
 # Solution: Sync with staging database
 npx prisma db pull
@@ -200,6 +216,7 @@ npx prisma generate
 ## 📊 **Testing Checklist**
 
 ### **✅ Functional Testing**
+
 - [ ] User authentication works
 - [ ] Dashboard loads without errors
 - [ ] Orders API returns data
@@ -208,12 +225,14 @@ npx prisma generate
 - [ ] Responsive design functions
 
 ### **✅ Performance Testing**
+
 - [ ] Page load times acceptable
 - [ ] Database queries efficient
 - [ ] No memory leaks
 - [ ] Service worker caching works
 
 ### **✅ Deployment Testing**
+
 - [ ] Documentation changes skip deployment
 - [ ] Code changes trigger deployment
 - [ ] Workflow optimizations work
