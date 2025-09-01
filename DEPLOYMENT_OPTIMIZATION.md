@@ -10,6 +10,7 @@
 ### Strategy 1: Branch Protection & PR-Only Deployments
 
 #### 1.1 Update Main Branch Protection
+
 ```yaml
 # Only deploy main via Pull Requests
 on:
@@ -24,6 +25,7 @@ jobs:
 ```
 
 #### 1.2 Feature Branch Development
+
 ```bash
 # New workflow pattern
 git checkout -b feature/your-feature-name
@@ -36,14 +38,16 @@ git push origin feature/your-feature-name
 ### Strategy 2: Deployment Batching
 
 #### 2.1 Scheduled Deployments
+
 ```yaml
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Deploy every 6 hours
+    - cron: '0 */6 * * *' # Deploy every 6 hours
   workflow_dispatch:
 ```
 
 #### 2.2 Manual Deployment Control
+
 ```bash
 # Use workflow_dispatch for manual control
 gh workflow run deploy.yml
@@ -52,6 +56,7 @@ gh workflow run deploy.yml
 ### Strategy 3: Smart Deployment Conditions
 
 #### 3.1 Skip Deployments for Docs
+
 ```yaml
 on:
   push:
@@ -64,6 +69,7 @@ on:
 ```
 
 #### 3.2 Deployment Skip Keywords
+
 ```yaml
 jobs:
   deploy:
@@ -73,6 +79,7 @@ jobs:
 ### Strategy 4: Environment-Specific Triggers
 
 #### 4.1 Production: PR-Only
+
 ```yaml
 # .github/workflows/deploy.yml
 on:
@@ -82,6 +89,7 @@ on:
 ```
 
 #### 4.2 Staging: Development Activity
+
 ```yaml
 # .github/workflows/deploy-staging.yml
 on:
@@ -94,16 +102,19 @@ on:
 ## 🔧 Implementation Plan
 
 ### Phase 1: Immediate Fixes (Today)
+
 1. ✅ Add `[skip-deploy]` to commit messages for docs
 2. ✅ Use feature branches for development
 3. ✅ Batch related changes into single commits
 
 ### Phase 2: Workflow Optimization (This Week)
+
 1. 🔄 Implement PR-only production deployments
 2. 🔄 Add path-based deployment skipping
 3. 🔄 Set up branch protection rules
 
 ### Phase 3: Advanced Optimization (Next Week)
+
 1. 📅 Consider scheduled deployments
 2. 🎛️ Implement deployment queuing
 3. 📊 Add deployment analytics
@@ -111,6 +122,7 @@ on:
 ## 📋 Best Practices Going Forward
 
 ### Commit Strategy
+
 ```bash
 # BAD: Multiple small commits
 git commit -m "fix typo"
@@ -123,6 +135,7 @@ git commit -m "Update documentation and fix typos [skip-deploy]"
 ```
 
 ### Branch Strategy
+
 ```bash
 # Feature development
 git checkout -b feature/dashboard-improvements
@@ -132,6 +145,7 @@ git push origin feature/dashboard-improvements
 ```
 
 ### Emergency Fixes
+
 ```bash
 # For urgent production fixes
 git commit -m "HOTFIX: Critical security update"
