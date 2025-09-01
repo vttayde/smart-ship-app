@@ -15,18 +15,15 @@ import {
 import { ArrowRight, CheckCircle, Clock, MapPin, Shield, Star, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
-  const [isStaging, setIsStaging] = useState(false);
 
-  // Check for staging environment on client side only to prevent hydration mismatch
-  useEffect(() => {
-    setIsStaging(
-      process.env.NODE_ENV === 'production' && window.location.hostname.includes('staging')
-    );
-  }, []);
+  // Environment indicator for staging
+  const isStaging =
+    process.env.NODE_ENV === 'production' &&
+    typeof window !== 'undefined' &&
+    window.location.hostname.includes('staging');
 
   const handleSearch = () => {
     // Redirect to detailed shipping form

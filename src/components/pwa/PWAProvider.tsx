@@ -24,15 +24,22 @@ export function PWAProvider({ children }: PWAProviderProps) {
   const [isInstalled, setIsInstalled] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [swUpdateAvailable, setSwUpdateAvailable] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
     }
 
     // Register service worker
-    if ('serviceWorker' in navigator) {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       registerServiceWorker();
     }
 
@@ -75,7 +82,7 @@ export function PWAProvider({ children }: PWAProviderProps) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [isInstalled]);
+  }, [isInstalled, isMounted]);
 
   const registerServiceWorker = async () => {
     try {
@@ -134,6 +141,11 @@ export function PWAProvider({ children }: PWAProviderProps) {
     // Don't show again for this session
     sessionStorage.setItem('installPromptDismissed', 'true');
   };
+
+  // Prevent hydration mismatch by only rendering PWA features on client
+  if (!isMounted) {
+    return <>{children}</>;
+  }
 
   return (
     <>
@@ -280,8 +292,8 @@ export function usePWA() {
       if (Notification.permission === 'granted') {
         navigator.serviceWorker.ready.then(registration => {
           registration.showNotification(title, {
-            icon: '/icons/icon-192x192.png',
-            badge: '/icons/badge-72x72.png',
+            icon: '/icons/icon-192x192.svg',
+            badge: '/icons/icon-32x32.svg',
             ...options,
           });
         });
