@@ -3,6 +3,10 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * GET /api/orders - Fetch user's orders
+ * Returns simplified order data for staging database compatibility
+ */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -11,33 +15,49 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's orders from database
+    // Get user efficiently
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: {
-        orders: {
-          include: {
-            pickupAddress: true,
-            deliveryAddress: true,
-            courierPartner: true,
-            payments: true,
-            trackingUpdates: true,
-          },
-          orderBy: { createdAt: 'desc' },
-        },
-      },
+      select: { id: true },
     });
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ orders: user.orders });
+    // Fetch orders with only existing fields (staging DB compatible)
+    const orders = await prisma.order.findMany({
+      where: { userId: user.id },
+      select: {
+        id: true,
+        userId: true,
+        trackingNumber: true,
+        status: true,
+        totalAmount: true,
+        weight: true,
+        packageType: true,
+        declaredValue: true,
+        courierOrderId: true,
+        courierTrackingId: true,
+        courierStatus: true,
+        serviceType: true,
+        parcelContents: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return NextResponse.json({ orders });
   } catch (error) {
     console.error('Error fetching orders:', error);
     return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
   }
 }
+
+/**
+ * POST /api/orders - Create new order
+ */
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,7 +80,7 @@ export async function POST(request: NextRequest) {
       deliveryInstructions,
     } = body;
 
-    // Get user ID
+    // Get user
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: { id: true },
