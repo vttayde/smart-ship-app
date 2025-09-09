@@ -45,4 +45,34 @@ For an interactive environment selector, visit: [Environment Selector](./public/
 
 ---
 
+## 📋 GitHub Repository About Section Setup
+
+### Recommended Configuration
+
+**Description:**
+
+```
+🚚 Smart Ship - Modern shipping management platform with multi-environment deployment. Production & Staging available via Vercel.
+```
+
+**Website URL:**
+
+```
+https://smart-ship-production.vercel.app
+```
+
+**Alternative Option - Include Both Environments:**
+
+```
+🚚 Smart Ship - Shipping management platform | 🟢 Production: smart-ship-production.vercel.app | 🟡 Staging: smart-ship-staging.vercel.app
+```
+
+**Topics (Add these tags):**
+
+```
+nextjs, typescript, tailwind-css, shipping, logistics, vercel, courier, tracking, india, ecommerce
+```
+
+---
+
 _Last Updated: December 2024_

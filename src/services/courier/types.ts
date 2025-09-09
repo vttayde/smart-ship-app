@@ -200,10 +200,12 @@ export class CourierServiceUnavailableError extends CourierAPIError {
 }
 
 export class CourierRateLimitError extends CourierAPIError {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public readonly retryAfter?: number;
+
   constructor(courierCode: string, retryAfter?: number) {
     super('Rate limit exceeded', courierCode);
     this.name = 'CourierRateLimitError';
+    this.retryAfter = retryAfter;
   }
 }
 
