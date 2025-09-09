@@ -22,7 +22,6 @@
     "*.config.js",
     "*.config.mjs",
     ".prettierrc",
-    "*.md",
-    "src/data/testPricingCalculator.ts"
+    "*.md"
   ]
 }

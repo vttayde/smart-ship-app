@@ -47,7 +47,6 @@ const eslintConfig = [
       '*.config.mjs',
       '.prettierrc',
       '*.md',
-      'src/data/testPricingCalculator.ts',
     ],
   },
 ];

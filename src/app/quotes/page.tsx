@@ -17,6 +17,7 @@ import type { CourierQuote } from '@/data/courierData';
 import { SAMPLE_SHIPPING_REQUESTS } from '@/data/mockData';
 import { pricingCalculator, type ShippingRequest } from '@/data/pricingCalculator';
 import { QuoteExporter } from '@/utils/QuoteExporter';
+import { formatCurrency } from '@/lib/utils-common';
 import { useEffect, useState } from 'react';
 
 export default function QuotesPage() {
@@ -79,15 +80,6 @@ export default function QuotesPage() {
 
   const toggleBreakdown = (quoteId: string) => {
     setShowBreakdown(showBreakdown === quoteId ? null : quoteId);
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(amount);
   };
 
   const getDeliveryText = (quote: CourierQuote) => {
