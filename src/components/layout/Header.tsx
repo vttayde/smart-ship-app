@@ -24,7 +24,7 @@ import {
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface NavigationItem {
   name: string;
@@ -38,6 +38,11 @@ export default function Header() {
   const { user, isAuthenticated } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/' });
@@ -68,10 +73,11 @@ export default function Header() {
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
-  const isDashboard = pathname?.startsWith('/dashboard');
+  const isDashboard = isClient && pathname?.startsWith('/dashboard');
   const navigationItems = isDashboard ? dashboardNavigationItems : publicNavigationItems;
 
   const isActivePath = (href: string) => {
+    if (!isClient) return false; // Prevent hydration mismatch
     if (href === '/') return pathname === '/';
     return pathname?.startsWith(href);
   };
@@ -101,8 +107,8 @@ export default function Header() {
                   key={item.name}
                   href={item.href}
                   className={`flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                 >
                   {item.icon && <item.icon className='w-4 h-4' />}
@@ -215,8 +221,8 @@ export default function Header() {
                     key={item.name}
                     href={item.href}
                     className={`flex items-center space-x-3 px-3 py-2 text-base font-medium rounded-md ${isActive
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                       }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
