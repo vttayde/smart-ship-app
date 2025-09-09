@@ -16,8 +16,8 @@ import { Card } from '@/components/ui/Card';
 import type { CourierQuote } from '@/data/courierData';
 import { SAMPLE_SHIPPING_REQUESTS } from '@/data/mockData';
 import { pricingCalculator, type ShippingRequest } from '@/data/pricingCalculator';
-import { QuoteExporter } from '@/utils/QuoteExporter';
 import { formatCurrency } from '@/lib/utils-common';
+import { QuoteExporter } from '@/utils/QuoteExporter';
 import { useEffect, useState } from 'react';
 
 export default function QuotesPage() {
