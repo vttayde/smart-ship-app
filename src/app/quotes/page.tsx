@@ -3,6 +3,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Layout from '@/components/layout/Layout';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { pricingCalculator, type ShippingRequest } from '@/data/pricingCalculator';
@@ -134,7 +135,8 @@ export default function QuotesPage() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 py-8'>
+    <Layout>
+      <div className='min-h-screen bg-gray-50 py-8'>
       <div className='max-w-6xl mx-auto px-4'>
         {/* Header */}
         <div className='mb-8'>
@@ -606,5 +608,6 @@ export default function QuotesPage() {
         onSelectQuote={handleSelectQuote}
       />
     </div>
+    </Layout>
   );
 }

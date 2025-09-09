@@ -46,6 +46,7 @@ export default function Header() {
   const publicNavigationItems: NavigationItem[] = [
     { name: 'Home', href: '/' },
     { name: 'Services', href: '/services' },
+    { name: 'Compare Quotes', href: '/quotes' },
     { name: 'Track Shipment', href: '/tracking/enhanced' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Contact', href: '/contact' },

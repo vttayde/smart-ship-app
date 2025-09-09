@@ -26,8 +26,8 @@ export default function Home() {
     window.location.hostname.includes('staging');
 
   const handleSearch = () => {
-    // Redirect to detailed shipping form
-    router.push('/ship');
+    // Redirect to quotes page for comparison
+    router.push('/quotes');
   };
 
   return (
@@ -273,12 +273,12 @@ export default function Home() {
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>
             <Link href='/auth/signup'>
               <Button size='lg' className='w-full sm:w-auto text-lg px-8 py-4'>
-                Get Started Free
+                Sign Up Free
                 <ArrowRight className='w-5 h-5 ml-2' />
               </Button>
             </Link>
-            <Button variant='outline' size='lg' className='w-full sm:w-auto text-lg px-8 py-4'>
-              View Pricing
+            <Button variant='outline' size='lg' className='w-full sm:w-auto text-lg px-8 py-4' onClick={() => router.push('/quotes')}>
+              Compare Pricing
             </Button>
           </div>
           <p className='text-sm text-gray-500 mt-4'>
