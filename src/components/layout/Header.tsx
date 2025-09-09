@@ -99,7 +99,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className='hidden md:flex items-center space-x-1'>
-            {navigationItems.map(item => {
+            {isClient && navigationItems.map(item => {
               const isActive = isActivePath(item.href);
 
               return (
@@ -213,7 +213,7 @@ export default function Header() {
         {isMobileMenuOpen && (
           <div className='md:hidden'>
             <div className='px-2 pt-2 pb-3 space-y-1 sm:px-3'>
-              {navigationItems.map(item => {
+              {isClient && navigationItems.map(item => {
                 const isActive = isActivePath(item.href);
 
                 return (
