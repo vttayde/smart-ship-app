@@ -2,28 +2,21 @@
 
 import NotificationSystem from '@/components/notifications/NotificationSystem';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import {
-  BarChart3,
   ChevronDown,
   History,
   LogOut,
   LucideIcon,
   Menu,
-  Package,
-  Plus,
-  Search,
   Settings,
-  TrendingUp,
   Truck,
-  Upload,
   User,
   X,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface NavigationItem {
@@ -33,7 +26,6 @@ interface NavigationItem {
 }
 
 export default function Header() {
-  const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -57,24 +49,15 @@ export default function Header() {
     { name: 'Contact', href: '/contact' },
   ];
 
-  const dashboardNavigationItems: NavigationItem[] = [
-    { name: 'Dashboard', href: '/dashboard/enhanced', icon: BarChart3 },
-    { name: 'Ship Now', href: '/shipping/enhanced', icon: Plus },
-    { name: 'My Orders', href: '/orders', icon: Package },
-    { name: 'Track', href: '/tracking/enhanced', icon: Search },
-    { name: 'Analytics', href: '/analytics', icon: TrendingUp },
-    { name: 'Bulk Operations', href: '/bulk', icon: Upload },
-    { name: 'Profile', href: '/profile', icon: User },
-  ];
-
   const userMenuItems: NavigationItem[] = [
     { name: 'My Profile', href: '/profile', icon: User },
     { name: 'Order History', href: '/orders', icon: History },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
-  const isDashboard = isClient && pathname?.startsWith('/dashboard');
-  const navigationItems = isDashboard ? dashboardNavigationItems : publicNavigationItems;
+  // For hydration safety, always use public navigation
+  // Dashboard-specific features can be added via separate components
+  const navigationItems = publicNavigationItems;
 
   const isActivePath = (href: string) => {
     if (!isClient) return false; // Prevent hydration mismatch
@@ -90,16 +73,11 @@ export default function Header() {
           <Link href={isAuthenticated ? '/dashboard' : '/'} className='flex items-center space-x-3'>
             <Truck className='w-8 h-8 text-blue-600' />
             <span className='text-xl font-bold text-gray-900'>Ship Smart</span>
-            {isDashboard && (
-              <Badge variant='secondary' className='ml-2'>
-                Dashboard
-              </Badge>
-            )}
           </Link>
 
           {/* Desktop Navigation */}
           <nav className='hidden md:flex items-center space-x-1'>
-            {isClient && navigationItems.map(item => {
+            {navigationItems.map(item => {
               const isActive = isActivePath(item.href);
 
               return (
@@ -124,17 +102,6 @@ export default function Header() {
               <div className='flex items-center space-x-4'>
                 {/* Notifications */}
                 <NotificationSystem />
-
-                {/* Quick Ship Button */}
-                {isDashboard && (
-                  <Button
-                    onClick={() => router.push('/dashboard/ship')}
-                    className='bg-blue-600 hover:bg-blue-700'
-                  >
-                    <Plus className='w-4 h-4 mr-2' />
-                    Ship Now
-                  </Button>
-                )}
 
                 {/* User Menu Dropdown */}
                 <div className='relative'>
@@ -213,7 +180,7 @@ export default function Header() {
         {isMobileMenuOpen && (
           <div className='md:hidden'>
             <div className='px-2 pt-2 pb-3 space-y-1 sm:px-3'>
-              {isClient && navigationItems.map(item => {
+              {navigationItems.map(item => {
                 const isActive = isActivePath(item.href);
 
                 return (
