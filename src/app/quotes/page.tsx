@@ -96,7 +96,7 @@ export default function QuotesPage() {
   };
 
   if (loading) {
-    return <Loading size="lg" text="Generating quotes..." className="min-h-screen" />;
+    return <Loading size='lg' text='Generating quotes...' className='min-h-screen' />;
   }
 
   return (
@@ -367,8 +367,9 @@ export default function QuotesPage() {
               {quotes.map(quote => (
                 <Card
                   key={quote.id}
-                  className={`p-6 transition-all duration-200 ${quote.isRecommended ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                    } ${selectedQuote === quote.id ? 'ring-2 ring-green-500' : ''}`}
+                  className={`p-6 transition-all duration-200 ${
+                    quote.isRecommended ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                  } ${selectedQuote === quote.id ? 'ring-2 ring-green-500' : ''}`}
                 >
                   <div className='flex items-start justify-between'>
                     <div className='flex-1'>

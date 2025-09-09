@@ -33,7 +33,6 @@ export class CourierManager {
       for (const config of activeConfigs) {
         await this.initializeCourierService(config);
       }
-
     } catch (error) {
       console.error('Error initializing courier services:', error);
       throw error;

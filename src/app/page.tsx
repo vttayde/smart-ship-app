@@ -277,7 +277,12 @@ export default function Home() {
                 <ArrowRight className='w-5 h-5 ml-2' />
               </Button>
             </Link>
-            <Button variant='outline' size='lg' className='w-full sm:w-auto text-lg px-8 py-4' onClick={() => router.push('/quotes')}>
+            <Button
+              variant='outline'
+              size='lg'
+              className='w-full sm:w-auto text-lg px-8 py-4'
+              onClick={() => router.push('/quotes')}
+            >
               Compare Pricing
             </Button>
           </div>
