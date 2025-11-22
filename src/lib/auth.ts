@@ -190,16 +190,11 @@ export const authOptions: NextAuthOptions = {
 
   events: {
     async signIn({ user: _user, account: _account }) {
-      // console.log('User signed in:', {
-      //   userId: user.id,
-      //   provider: account?.provider,
-      // });
+      // User sign-in event handler
     },
 
     async signOut({ session: _session, token: _token }) {
-      // console.log('User signed out:', {
-      //   userId: token?.id || session?.user?.id,
-      // });
+      // User sign-out event handler
     },
   },
 

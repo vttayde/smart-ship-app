@@ -15,19 +15,49 @@ import {
 import { ArrowRight, CheckCircle, Clock, MapPin, Shield, Star, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
+  const [isStaging, setIsStaging] = useState(false);
 
-  // Environment indicator for staging
-  const isStaging =
-    process.env.NODE_ENV === 'production' &&
-    typeof window !== 'undefined' &&
-    window.location.hostname.includes('staging');
+  // Form state
+  const [fromCity, setFromCity] = useState('');
+  const [toCity, setToCity] = useState('');
+  const [weight, setWeight] = useState('');
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
 
-  const handleSearch = () => {
-    // Redirect to detailed shipping form
-    router.push('/ship');
+  // Environment indicator for staging - use effect to avoid hydration mismatch
+  useEffect(() => {
+    const staging = process.env.NODE_ENV === 'production' &&
+      window.location.hostname.includes('staging');
+    setIsStaging(staging);
+  }, []);
+
+  const validateForm = () => {
+    return fromCity && toCity && weight && fromCity !== toCity;
+  };
+
+  const handleCompareRates = () => {
+    if (!validateForm()) {
+      setShowValidationErrors(true);
+      return;
+    }
+
+    // Reset validation errors
+    setShowValidationErrors(false);
+
+    // Store form data in sessionStorage for the quotes page
+    const searchData = {
+      fromCity,
+      toCity,
+      weight,
+      timestamp: new Date().toISOString(),
+    };
+    sessionStorage.setItem('quoteSearchData', JSON.stringify(searchData));
+
+    // Redirect to quotes page for comparison
+    router.push('/quotes');
   };
 
   return (
@@ -71,10 +101,10 @@ export default function Home() {
                 <div className='space-y-2'>
                   <label className='flex items-center text-sm font-medium text-gray-700'>
                     <MapPin className='w-4 h-4 mr-2 text-blue-600' />
-                    From City
+                    From City *
                   </label>
-                  <Select>
-                    <SelectTrigger className='h-12'>
+                  <Select value={fromCity} onValueChange={setFromCity}>
+                    <SelectTrigger className={`h-12 ${showValidationErrors && !fromCity ? 'border-red-500' : ''}`}>
                       <SelectValue placeholder='Select pickup city' />
                     </SelectTrigger>
                     <SelectContent>
@@ -84,17 +114,24 @@ export default function Home() {
                       <SelectItem value='chennai'>Chennai</SelectItem>
                       <SelectItem value='kolkata'>Kolkata</SelectItem>
                       <SelectItem value='pune'>Pune</SelectItem>
+                      <SelectItem value='hyderabad'>Hyderabad</SelectItem>
+                      <SelectItem value='ahmedabad'>Ahmedabad</SelectItem>
+                      <SelectItem value='jaipur'>Jaipur</SelectItem>
+                      <SelectItem value='surat'>Surat</SelectItem>
                     </SelectContent>
                   </Select>
+                  {showValidationErrors && !fromCity && (
+                    <p className='text-red-500 text-xs'>Please select pickup city</p>
+                  )}
                 </div>
 
                 <div className='space-y-2'>
                   <label className='flex items-center text-sm font-medium text-gray-700'>
                     <MapPin className='w-4 h-4 mr-2 text-green-600' />
-                    To City
+                    To City *
                   </label>
-                  <Select>
-                    <SelectTrigger className='h-12'>
+                  <Select value={toCity} onValueChange={setToCity}>
+                    <SelectTrigger className={`h-12 ${showValidationErrors && !toCity ? 'border-red-500' : ''} ${showValidationErrors && fromCity === toCity ? 'border-red-500' : ''}`}>
                       <SelectValue placeholder='Select delivery city' />
                     </SelectTrigger>
                     <SelectContent>
@@ -104,17 +141,27 @@ export default function Home() {
                       <SelectItem value='hyderabad'>Hyderabad</SelectItem>
                       <SelectItem value='ahmedabad'>Ahmedabad</SelectItem>
                       <SelectItem value='jaipur'>Jaipur</SelectItem>
+                      <SelectItem value='bangalore'>Bangalore</SelectItem>
+                      <SelectItem value='chennai'>Chennai</SelectItem>
+                      <SelectItem value='kolkata'>Kolkata</SelectItem>
+                      <SelectItem value='surat'>Surat</SelectItem>
                     </SelectContent>
                   </Select>
+                  {showValidationErrors && !toCity && (
+                    <p className='text-red-500 text-xs'>Please select delivery city</p>
+                  )}
+                  {showValidationErrors && fromCity === toCity && fromCity && toCity && (
+                    <p className='text-red-500 text-xs'>Pickup and delivery cities must be different</p>
+                  )}
                 </div>
 
                 <div className='space-y-2'>
                   <label className='flex items-center text-sm font-medium text-gray-700'>
                     <Shield className='w-4 h-4 mr-2 text-orange-600' />
-                    Package Weight
+                    Package Weight *
                   </label>
-                  <Select>
-                    <SelectTrigger className='h-12'>
+                  <Select value={weight} onValueChange={setWeight}>
+                    <SelectTrigger className={`h-12 ${showValidationErrors && !weight ? 'border-red-500' : ''}`}>
                       <SelectValue placeholder='Select weight' />
                     </SelectTrigger>
                     <SelectContent>
@@ -126,12 +173,19 @@ export default function Home() {
                       <SelectItem value='more'>More than 10 KG</SelectItem>
                     </SelectContent>
                   </Select>
+                  {showValidationErrors && !weight && (
+                    <p className='text-red-500 text-xs'>Please select package weight</p>
+                  )}
                 </div>
 
                 <div className='flex items-end'>
                   <Button
-                    onClick={handleSearch}
-                    className='w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700'
+                    onClick={handleCompareRates}
+                    disabled={!validateForm()}
+                    className={`w-full h-12 text-lg font-semibold transition-all duration-200 ${validateForm()
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
                   >
                     <ArrowRight className='w-5 h-5 mr-2' />
                     Compare Rates
@@ -273,12 +327,17 @@ export default function Home() {
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>
             <Link href='/auth/signup'>
               <Button size='lg' className='w-full sm:w-auto text-lg px-8 py-4'>
-                Get Started Free
+                Sign Up Free
                 <ArrowRight className='w-5 h-5 ml-2' />
               </Button>
             </Link>
-            <Button variant='outline' size='lg' className='w-full sm:w-auto text-lg px-8 py-4'>
-              View Pricing
+            <Button
+              variant='outline'
+              size='lg'
+              className='w-full sm:w-auto text-lg px-8 py-4'
+              onClick={() => router.push('/quotes')}
+            >
+              Compare Pricing
             </Button>
           </div>
           <p className='text-sm text-gray-500 mt-4'>

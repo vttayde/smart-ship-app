@@ -33,8 +33,6 @@ export class CourierManager {
       for (const config of activeConfigs) {
         await this.initializeCourierService(config);
       }
-
-      // console.log(`Initialized ${this.services.size} courier services`);
     } catch (error) {
       console.error('Error initializing courier services:', error);
       throw error;
@@ -72,7 +70,6 @@ export class CourierManager {
       }
 
       this.services.set(config.courierCode, service);
-      // console.log(`Initialized ${config.courierName} service`);
     } catch (error) {
       console.error(`Error initializing ${config.courierCode} service:`, error);
     }

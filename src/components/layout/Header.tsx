@@ -2,29 +2,22 @@
 
 import NotificationSystem from '@/components/notifications/NotificationSystem';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import {
-  BarChart3,
   ChevronDown,
   History,
   LogOut,
   LucideIcon,
   Menu,
-  Package,
-  Plus,
-  Search,
   Settings,
-  TrendingUp,
   Truck,
-  Upload,
   User,
   X,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface NavigationItem {
   name: string;
@@ -33,11 +26,15 @@ interface NavigationItem {
 }
 
 export default function Header() {
-  const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/' });
@@ -46,19 +43,10 @@ export default function Header() {
   const publicNavigationItems: NavigationItem[] = [
     { name: 'Home', href: '/' },
     { name: 'Services', href: '/services' },
+    { name: 'Compare Quotes', href: '/quotes' },
     { name: 'Track Shipment', href: '/tracking/enhanced' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'Contact', href: '/contact' },
-  ];
-
-  const dashboardNavigationItems: NavigationItem[] = [
-    { name: 'Dashboard', href: '/dashboard/enhanced', icon: BarChart3 },
-    { name: 'Ship Now', href: '/shipping/enhanced', icon: Plus },
-    { name: 'My Orders', href: '/orders', icon: Package },
-    { name: 'Track', href: '/tracking/enhanced', icon: Search },
-    { name: 'Analytics', href: '/analytics', icon: TrendingUp },
-    { name: 'Bulk Operations', href: '/bulk', icon: Upload },
-    { name: 'Profile', href: '/profile', icon: User },
   ];
 
   const userMenuItems: NavigationItem[] = [
@@ -67,10 +55,12 @@ export default function Header() {
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
-  const isDashboard = pathname?.startsWith('/dashboard');
-  const navigationItems = isDashboard ? dashboardNavigationItems : publicNavigationItems;
+  // For hydration safety, always use public navigation
+  // Dashboard-specific features can be added via separate components
+  const navigationItems = publicNavigationItems;
 
   const isActivePath = (href: string) => {
+    if (!isClient) return false; // Prevent hydration mismatch
     if (href === '/') return pathname === '/';
     return pathname?.startsWith(href);
   };
@@ -83,11 +73,6 @@ export default function Header() {
           <Link href={isAuthenticated ? '/dashboard' : '/'} className='flex items-center space-x-3'>
             <Truck className='w-8 h-8 text-blue-600' />
             <span className='text-xl font-bold text-gray-900'>Ship Smart</span>
-            {isDashboard && (
-              <Badge variant='secondary' className='ml-2'>
-                Dashboard
-              </Badge>
-            )}
           </Link>
 
           {/* Desktop Navigation */}
@@ -118,17 +103,6 @@ export default function Header() {
               <div className='flex items-center space-x-4'>
                 {/* Notifications */}
                 <NotificationSystem />
-
-                {/* Quick Ship Button */}
-                {isDashboard && (
-                  <Button
-                    onClick={() => router.push('/dashboard/ship')}
-                    className='bg-blue-600 hover:bg-blue-700'
-                  >
-                    <Plus className='w-4 h-4 mr-2' />
-                    Ship Now
-                  </Button>
-                )}
 
                 {/* User Menu Dropdown */}
                 <div className='relative'>

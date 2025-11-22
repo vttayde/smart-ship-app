@@ -20,35 +20,69 @@ export interface FilterOptions {
   features?: string[];
 }
 
-// Service comparison utilities
+// Service comparison utilities with memoization for performance
 export class ServiceComparison {
+  private static sortCache = new Map<string, CourierQuote[]>();
+  private static filterCache = new Map<string, CourierQuote[]>();
+
   static sortQuotes(quotes: CourierQuote[], sortBy: SortOption): CourierQuote[] {
+    // Create cache key
+    const cacheKey = `${JSON.stringify(quotes.map(q => q.id))}-${sortBy}`;
+    
+    // Check cache first
+    if (this.sortCache.has(cacheKey)) {
+      return this.sortCache.get(cacheKey)!;
+    }
+
     const sortedQuotes = [...quotes];
 
     switch (sortBy) {
       case 'price':
-        return sortedQuotes.sort((a, b) => a.pricing.totalPrice - b.pricing.totalPrice);
+        sortedQuotes.sort((a, b) => a.pricing.totalPrice - b.pricing.totalPrice);
+        break;
 
       case 'delivery':
-        return sortedQuotes.sort((a, b) => a.delivery.minDays - b.delivery.minDays);
+        sortedQuotes.sort((a, b) => a.delivery.minDays - b.delivery.minDays);
+        break;
 
       case 'rating':
-        return sortedQuotes.sort((a, b) => b.courierService.rating - a.courierService.rating);
+        sortedQuotes.sort((a, b) => b.courierService.rating - a.courierService.rating);
+        break;
 
       case 'recommended':
-        return sortedQuotes.sort((a, b) => {
+        sortedQuotes.sort((a, b) => {
           if (a.isRecommended && !b.isRecommended) return -1;
           if (!a.isRecommended && b.isRecommended) return 1;
           return a.pricing.totalPrice - b.pricing.totalPrice;
         });
+        break;
 
       default:
-        return sortedQuotes;
+        // No sorting needed
+        break;
     }
+
+    // Cache result
+    this.sortCache.set(cacheKey, sortedQuotes);
+    
+    // Clear cache if it gets too large (prevent memory leaks)
+    if (this.sortCache.size > 100) {
+      this.sortCache.clear();
+    }
+
+    return sortedQuotes;
   }
 
   static filterQuotes(quotes: CourierQuote[], filters: FilterOptions): CourierQuote[] {
-    return quotes.filter(quote => {
+    // Create cache key
+    const cacheKey = `${JSON.stringify(quotes.map(q => q.id))}-${JSON.stringify(filters)}`;
+    
+    // Check cache first
+    if (this.filterCache.has(cacheKey)) {
+      return this.filterCache.get(cacheKey)!;
+    }
+
+    const filteredQuotes = quotes.filter(quote => {
       // Price filter
       if (filters.maxPrice && quote.pricing.totalPrice > filters.maxPrice) {
         return false;
@@ -92,6 +126,16 @@ export class ServiceComparison {
 
       return true;
     });
+
+    // Cache result
+    this.filterCache.set(cacheKey, filteredQuotes);
+    
+    // Clear cache if it gets too large (prevent memory leaks)
+    if (this.filterCache.size > 100) {
+      this.filterCache.clear();
+    }
+
+    return filteredQuotes;
   }
 
   static compareQuotes(quotes: CourierQuote[]): {
