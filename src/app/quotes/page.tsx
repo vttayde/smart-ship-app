@@ -18,19 +18,28 @@ import { RatingStars } from '@/components/ui/RatingStars';
 import type { CourierQuote } from '@/data/courierData';
 import { SAMPLE_SHIPPING_REQUESTS } from '@/data/mockData';
 import { pricingCalculator, type ShippingRequest } from '@/data/pricingCalculator';
+import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/lib/utils-common';
 import { QuoteExporter } from '@/utils/QuoteExporter';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function QuotesPage() {
-  const [quotes, setQuotes] = useState<CourierQuote[]>([]);
-  const [allQuotes, setAllQuotes] = useState<CourierQuote[]>([]); // Store all quotes for filtering
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
+  const [allQuotes, setAllQuotes] = useState<CourierQuote[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedQuote, setSelectedQuote] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState<string | null>(null);
   const [currentRequest, setCurrentRequest] = useState<ShippingRequest>(
     SAMPLE_SHIPPING_REQUESTS[0].request
   );
+  const [searchData, setSearchData] = useState<{
+    fromCity: string;
+    toCity: string;
+    weight: string;
+    timestamp: string;
+  } | null>(null);
 
   // New comparison features
   const [sortBy, setSortBy] = useState<SortOption>('recommended');
@@ -38,62 +47,99 @@ export default function QuotesPage() {
   const [comparisonMode, setComparisonMode] = useState(false);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
 
+  // Load search data from sessionStorage on component mount
   useEffect(() => {
-    generateQuotes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentRequest]);
+    const storedSearchData = sessionStorage.getItem('quoteSearchData');
+    if (storedSearchData) {
+      try {
+        const parsedData = JSON.parse(storedSearchData);
+        setSearchData(parsedData);
 
-  // Apply sorting and filtering when quotes, sortBy, or filters change
-  useEffect(() => {
-    if (allQuotes.length > 0) {
-      let processedQuotes = ServiceComparison.filterQuotes(allQuotes, filters);
-      processedQuotes = ServiceComparison.sortQuotes(processedQuotes, sortBy);
-      setQuotes(processedQuotes);
+        // Update current request based on search data
+        const updatedRequest: ShippingRequest = {
+          ...SAMPLE_SHIPPING_REQUESTS[0].request,
+          fromCity: parsedData.fromCity,
+          toCity: parsedData.toCity,
+          weight: parseFloat(parsedData.weight) || 1,
+        };
+        setCurrentRequest(updatedRequest);
+      } catch (error) {
+        console.error('Error parsing search data:', error);
+      }
     }
+  }, []);
+
+  // Memoized filtered and sorted quotes
+  const quotes = useMemo(() => {
+    if (allQuotes.length === 0) return [];
+
+    let processedQuotes = ServiceComparison.filterQuotes(allQuotes, filters);
+    processedQuotes = ServiceComparison.sortQuotes(processedQuotes, sortBy);
+    return processedQuotes;
   }, [allQuotes, sortBy, filters]);
 
-  const generateQuotes = async () => {
+  const generateQuotes = useCallback(async () => {
     setLoading(true);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
+      // Remove unnecessary delay for better performance
       const generatedQuotes = pricingCalculator.generateQuotes(currentRequest);
-      setAllQuotes(generatedQuotes); // Store all quotes
-
-      // Apply initial sorting and filtering
-      let processedQuotes = ServiceComparison.filterQuotes(generatedQuotes, filters);
-      processedQuotes = ServiceComparison.sortQuotes(processedQuotes, sortBy);
-      setQuotes(processedQuotes);
+      setAllQuotes(generatedQuotes);
     } catch (error) {
       console.error('Error generating quotes:', error);
-      setQuotes([]);
       setAllQuotes([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentRequest]);
 
-  const handleSelectQuote = (quoteId: string) => {
+  useEffect(() => {
+    generateQuotes();
+  }, [generateQuotes]);
+
+  const handleSelectQuote = useCallback((quoteId: string) => {
+    if (!isAuthenticated) {
+      // Store intended action for after login
+      sessionStorage.setItem('pendingAction', JSON.stringify({
+        type: 'book_shipment',
+        quoteId,
+        searchData: searchData || currentRequest
+      }));
+
+      // Redirect to login page with return URL
+      router.push('/auth/login?redirect=/quotes');
+      return;
+    }
+
+    // User is authenticated, proceed to booking
     setSelectedQuote(quoteId);
-    // Here you would typically proceed to booking
-    alert(`Selected quote: ${quoteId}`);
-  };
+    const selectedQuoteData = allQuotes.find(q => q.id === quoteId);
+    if (selectedQuoteData) {
+      // Navigate to shipping page with pre-filled data
+      const params = new URLSearchParams({
+        courier: selectedQuoteData.courierService.name,
+        quoteId: quoteId,
+        from: searchData?.fromCity || currentRequest.fromCity,
+        to: searchData?.toCity || currentRequest.toCity,
+        weight: (searchData?.weight || currentRequest.weight).toString(),
+      });
+      router.push(`/ship?${params.toString()}`);
+    }
+  }, [isAuthenticated, router, searchData, currentRequest, allQuotes]);
 
-  const toggleBreakdown = (quoteId: string) => {
+  const toggleBreakdown = useCallback((quoteId: string) => {
     setShowBreakdown(showBreakdown === quoteId ? null : quoteId);
-  };
+  }, [showBreakdown]);
 
-  const getDeliveryText = (quote: CourierQuote) => {
+  const getDeliveryText = useCallback((quote: CourierQuote) => {
     if (quote.delivery.minDays === quote.delivery.maxDays) {
       return `${quote.delivery.minDays} ${quote.delivery.minDays === 1 ? 'day' : 'days'}`;
     }
     return `${quote.delivery.minDays}-${quote.delivery.maxDays} days`;
-  };
+  }, []);
 
-  const getRatingStars = (rating: number) => {
+  const getRatingStars = useCallback((rating: number) => {
     return <RatingStars rating={rating} />;
-  };
+  }, []);
 
   if (loading) {
     return <Loading size='lg' text='Generating quotes...' className='min-h-screen' />;
@@ -111,6 +157,11 @@ export default function QuotesPage() {
                 <p className='text-gray-600'>
                   Compare rates from {allQuotes.length} courier partners for your shipment
                 </p>
+                {searchData && (
+                  <div className='mt-2 text-sm text-blue-600'>
+                    📍 {searchData.fromCity} → {searchData.toCity} • {searchData.weight} KG
+                  </div>
+                )}
               </div>
               <div className='mt-4 lg:mt-0 flex space-x-2'>
                 <Button
@@ -135,20 +186,20 @@ export default function QuotesPage() {
               <div className='grid grid-cols-1 md:grid-cols-3 gap-4 text-sm'>
                 <div>
                   <p className='text-gray-600'>From</p>
-                  <p className='font-medium'>
-                    {currentRequest.fromCity}, {currentRequest.fromState}
+                  <p className='font-medium capitalize'>
+                    {searchData?.fromCity || currentRequest.fromCity}
                   </p>
                 </div>
                 <div>
                   <p className='text-gray-600'>To</p>
-                  <p className='font-medium'>
-                    {currentRequest.toCity}, {currentRequest.toState}
+                  <p className='font-medium capitalize'>
+                    {searchData?.toCity || currentRequest.toCity}
                   </p>
                 </div>
                 <div>
                   <p className='text-gray-600'>Package</p>
                   <p className='font-medium'>
-                    {currentRequest.weight}kg • {currentRequest.deliveryType}
+                    {searchData?.weight || currentRequest.weight} KG, {currentRequest.dimensions.length} × {currentRequest.dimensions.width} × {currentRequest.dimensions.height} cm
                   </p>
                 </div>
               </div>
@@ -367,9 +418,8 @@ export default function QuotesPage() {
               {quotes.map(quote => (
                 <Card
                   key={quote.id}
-                  className={`p-6 transition-all duration-200 ${
-                    quote.isRecommended ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                  } ${selectedQuote === quote.id ? 'ring-2 ring-green-500' : ''}`}
+                  className={`p-6 transition-all duration-200 ${quote.isRecommended ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                    } ${selectedQuote === quote.id ? 'ring-2 ring-green-500' : ''}`}
                 >
                   <div className='flex items-start justify-between'>
                     <div className='flex-1'>

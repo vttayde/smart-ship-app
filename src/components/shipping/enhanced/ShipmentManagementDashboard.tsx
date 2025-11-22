@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/badge';
 import {
   AlertTriangle,
-  BarChart3,
   CheckCircle,
   Clock,
   DollarSign,
@@ -139,13 +138,13 @@ export default function ShipmentManagementDashboard() {
   ): 'default' | 'warning' | 'info' | 'success' | 'destructive' | 'secondary' | 'outline' => {
     const colors: {
       [key: string]:
-        | 'default'
-        | 'warning'
-        | 'info'
-        | 'success'
-        | 'destructive'
-        | 'secondary'
-        | 'outline';
+      | 'default'
+      | 'warning'
+      | 'info'
+      | 'success'
+      | 'destructive'
+      | 'secondary'
+      | 'outline';
     } = {
       pending: 'warning',
       confirmed: 'info',
@@ -164,13 +163,13 @@ export default function ShipmentManagementDashboard() {
   ): 'default' | 'warning' | 'info' | 'success' | 'destructive' | 'secondary' | 'outline' => {
     const colors: {
       [key: string]:
-        | 'default'
-        | 'warning'
-        | 'info'
-        | 'success'
-        | 'destructive'
-        | 'secondary'
-        | 'outline';
+      | 'default'
+      | 'warning'
+      | 'info'
+      | 'success'
+      | 'destructive'
+      | 'secondary'
+      | 'outline';
     } = {
       low: 'secondary',
       medium: 'warning',
@@ -413,7 +412,7 @@ export default function ShipmentManagementDashboard() {
         <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
-              <BarChart3 className='w-5 h-5' />
+              <TrendingUp className='w-5 h-5' />
               Courier Performance
             </CardTitle>
           </CardHeader>
@@ -436,13 +435,12 @@ export default function ShipmentManagementDashboard() {
                   <div className='flex items-center gap-2'>
                     <div className='flex-1 bg-gray-200 rounded-full h-2'>
                       <div
-                        className={`h-2 rounded-full ${
-                          courier.onTimeRate >= 90
-                            ? 'bg-green-500'
-                            : courier.onTimeRate >= 80
-                              ? 'bg-yellow-500'
-                              : 'bg-red-500'
-                        }`}
+                        className={`h-2 rounded-full ${courier.onTimeRate >= 90
+                          ? 'bg-green-500'
+                          : courier.onTimeRate >= 80
+                            ? 'bg-yellow-500'
+                            : 'bg-red-500'
+                          }`}
                         style={{ width: `${courier.onTimeRate}%` }}
                       />
                     </div>
@@ -471,7 +469,7 @@ export default function ShipmentManagementDashboard() {
               <span>Bulk Track</span>
             </Button>
             <Button variant='outline' className='h-20 flex flex-col items-center justify-center'>
-              <BarChart3 className='w-6 h-6 mb-2' />
+              <TrendingUp className='w-6 h-6 mb-2' />
               <span>Analytics</span>
             </Button>
             <Button variant='outline' className='h-20 flex flex-col items-center justify-center'>

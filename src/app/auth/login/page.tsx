@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { signIn, getSession } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/badge';
 import { Loading } from '@/components/ui/loading';
-import { Eye, EyeOff, Mail, Lock, ArrowRight, CheckCircle, Truck, Shield } from 'lucide-react';
+import { ArrowRight, CheckCircle, Eye, EyeOff, Lock, Mail, Shield, Truck } from 'lucide-react';
+import { getSession, signIn } from 'next-auth/react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,11 +47,39 @@ export default function LoginPage() {
         // Wait for session to update
         const session = await getSession();
         if (session) {
-          router.push('/dashboard');
-          router.refresh();
+          // Check for pending actions from quote selection
+          const pendingAction = sessionStorage.getItem('pendingAction');
+          if (pendingAction) {
+            try {
+              const action = JSON.parse(pendingAction);
+              sessionStorage.removeItem('pendingAction');
+
+              if (action.type === 'book_shipment') {
+                // Redirect back to quotes page or directly to shipping
+                const redirectUrl = action.quoteId
+                  ? `/ship?quoteId=${action.quoteId}`
+                  : '/quotes';
+                router.push(redirectUrl);
+                return;
+              }
+            } catch (error) {
+              console.error('Error parsing pending action:', error);
+            }
+          }
+
+          // Check for URL redirect parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectUrl = urlParams.get('redirect');
+
+          if (redirectUrl) {
+            router.push(redirectUrl);
+          } else {
+            router.push('/dashboard');
+          }
         }
       }
-    } catch {
+    } catch (error) {
+      console.error('Login error:', error);
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
